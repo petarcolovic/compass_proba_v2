@@ -52,9 +52,7 @@
       background:var(--accent);
       color:#ffffff;
     }
-    .scale input {
-      accent-color:var(--accent);
-    }
+    .scale input { accent-color:var(--accent); }
     .actions{display:flex;gap:12px;justify-content:flex-end;padding:14px 20px;border-top:1px solid rgba(0,0,0,.06)}
     button{background:var(--accent);border:none;color:#fff;padding:10px 16px;border-radius:12px;font-weight:600;cursor:pointer}
     .muted{color:var(--muted)}
@@ -107,8 +105,25 @@
       {"id":1,"text":"Potrebna su mi precizna uputstva kako bih tačno znao šta se od mene očekuje","dim":"C1"},
       {"id":2,"text":"Pojedinac treba da stavi interes grupe ispred svog","dim":"C3"},
       {"id":3,"text":"Smatram da je pažljivo upravljanje novcem veoma važno","dim":"C4"},
-      {"id":4,"text":"Moj primarni cilj u donošenju odluka je da postignem najbolje rezultate čak i ako to znači da zasenim ideje drugih","dim":"C2"}
-      // ⬆️ Skratio sam listu radi preglednosti, ali ti možeš uneti svih 22 stavke.
+      {"id":4,"text":"Moj primarni cilj u donošenju odluka je da postignem najbolje rezultate čak i ako to znači da zasenim ideje drugih","dim":"C2"},
+      {"id":5,"text":"Nije poželjno da rukovodioci često traže mišljenje zaposlenih na nižim pozicijama","dim":"C2"},
+      {"id":6,"text":"Pridržavanje pravila i procedura je ključno za dobar rad","dim":"C1"},
+      {"id":7,"text":"Čak i u teškim vremenima ljudi bi trebalo da ostanu lojalni svojoj grupi","dim":"C3"},
+      {"id":8,"text":"Za mene je važno da istrajem i kada se suočavam sa otporom","dim":"C4"},
+      {"id":9,"text":"Kako se ljudi osjećaju u procesu donošenja odluka nije važan faktor","dim":"C2"},
+      {"id":10,"text":"Pravila i propisi mi pomažu da znam šta se od mene očekuje","dim":"C1"},
+      {"id":11,"text":"Važnije je da grupa napreduje nego da se ističu pojedinci","dim":"C3"},
+      {"id":12,"text":"Nije mi bitan uticaj odluka na osjećanja i odnose ljudi","dim":"C2"},
+      {"id":13,"text":"Standardizovane procedure olakšavaju obavljanje posla","dim":"C1"},
+      {"id":14,"text":"Bolje je kada uspije tim nego pojedinac","dim":"C3"},
+      {"id":15,"text":"Dugoročno planiranje mi je izuzetno značajno","dim":"C4"},
+      {"id":16,"text":"Zadovoljniji sam kada moje odluke dovedu do boljih rezultata od rezultata mojih kolega","dim":"C2"},
+      {"id":17,"text":"Važne zadatke ne bi trebalo delegirati zaposlenima na nižim pozicijama","dim":"C2"},
+      {"id":18,"text":"Jasne procedure su ključne za uspješnu realizaciju zadataka","dim":"C1"},
+      {"id":19,"text":"Prije nego što se posveti svojim ciljevima pojedinac bi trebalo da razmisli o tome kako oni utiču na grupu","dim":"C3"},
+      {"id":20,"text":"Spreman sam da se odreknem zabave danas zarad budućeg uspjeha","dim":"C4"},
+      {"id":21,"text":"Lojalnost prema grupi treba podsticati čak i kada se kosi s ličnim ciljevima","dim":"C3"},
+      {"id":22,"text":"Naporan rad zarad uspjeha u budućnosti za mene je važan","dim":"C4"}
     ];
 
     const NORMS = {
@@ -121,11 +136,12 @@
     const FIGURES = [
       {"name":"Queen Victoria","description":"Kraljica Engleske","wiki":"https://sh.wikipedia.org/wiki/Viktorija","profile":{"C1":70.0,"C2":50.0,"C3":50.0,"C4":50.0}},
       {"name":"Napoleon","description":"Francuski imperator","wiki":"https://sh.wikipedia.org/wiki/Napoleon_I_Bonaparte","profile":{"C1":50.0,"C2":70.0,"C3":50.0,"C4":50.0}},
-      {"name":"Marie Therese","description":"Austrijska carica","wiki":"https://sh.wikipedia.org/wiki/Maria_Theresia","profile":{"C1":50.0,"C2":50.0,"C3":70.0,"C4":50.0}}
+      {"name":"Marie Therese","description":"Austrijska carica","wiki":"https://sh.wikipedia.org/wiki/Maria_Theresia","profile":{"C1":50.0,"C2":50.0,"C3":70.0,"C4":50.0}},
+      {"name":"Franklin Roosevelt","description":"Američki predsednik","wiki":"https://sh.wikipedia.org/wiki/Franklin_Delano_Roosevelt","profile":{"C1":50.0,"C2":50.0,"C3":50.0,"C4":70.0}}
     ];
 
-    // Render pitanja
-    const qWrap = document.getElementById('questions');
+    // render pitanja
+    const qWrap=document.getElementById('questions');
     ITEMS.forEach(q=>{
       const div=document.createElement('div');
       div.className='q';
@@ -141,7 +157,6 @@
       qWrap.appendChild(div);
     });
 
-    // Računanje raw i normiranih skorova
     function computeRawScores(form){
       const sums={};
       ITEMS.forEach(q=>{
@@ -176,7 +191,6 @@
       return num/Math.sqrt(denU*denF||1);
     }
 
-    // Crtanje kompasa
     function drawCompass(user, figure){
       const canvas=document.getElementById('compassCanvas');
       const ctx=canvas.getContext('2d');
@@ -210,7 +224,6 @@
       drawPoly(figure,'rgba(255,110,110,1)');
     }
 
-    // Submit forma
     const form=document.getElementById('quiz');
     const legendDiv=document.getElementById('legend');
     const detailsDiv=document.getElementById('details');
@@ -221,8 +234,7 @@
       const dims=['C1','C2','C3','C4'];
       const normed={}; dims.forEach(d=>normed[d]=Number(normLookup(d,raw[d]||0).toFixed(2)));
 
-      // Najsličniji i najrazličitiji po Koenovoj meri
-      let best=null,worst=null, bestR=-Infinity,worstR=Infinity;
+      let best=null,worst=null,bestR=-Infinity,worstR=Infinity;
       FIGURES.forEach(f=>{
         const r=profileSimilarity(normed,f.profile);
         if(r>bestR){bestR=r;best=f;}
@@ -236,19 +248,11 @@
         <p>${best.description}</p>
         <p>Sličnost (r): ${bestR.toFixed(2)}</p>
         <p><a href="${best.wiki}" target="_blank" rel="noopener">Pročitaj više na Wikipediji →</a></p></div>
-        <div class="best-card"><h2>Najrazličitiji si: ${worst.name}</h2>
+        <div class="best-card"><h2>Najrazličitiji si od: ${worst.name}</h2>
         <p>${worst.description}</p>
         <p>Sličnost (r): ${worstR.toFixed(2)}</p>
         <p><a href="${worst.wiki}" target="_blank" rel="noopener">Pročitaj više na Wikipediji →</a></p></div>`;
+      window.scrollTo({top:0,behavior:'smooth'});
     });
 
-    document.getElementById('resetBtn').addEventListener('click',()=>{
-      form.reset();
-      const ctx=document.getElementById('compassCanvas').getContext('2d');
-      ctx.clearRect(0,0,400,400);
-      legendDiv.innerHTML="";
-      detailsDiv.innerHTML='<p class="muted small">Nakon slanja testa, ovde će biti prikazan kompas dijagram, tvoji skorovi i najbliža/najrazličitija istorijska ličnost.</p>';
-    });
-  </script>
-</body>
-</html>
+    document.getElementById('resetBtn').
