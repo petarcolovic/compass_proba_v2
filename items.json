@@ -1,0 +1,112 @@
+[
+  {
+    "id": 1,
+    "text": "Potrebna su mi precizna uputstva kako bih tačno znao šta se od mene očekuje                                         ",
+    "dim": "C1"
+  },
+  {
+    "id": 2,
+    "text": "Pojedinac treba da stavi interes grupe ispred svog                                                                  ",
+    "dim": "C3"
+  },
+  {
+    "id": 3,
+    "text": "Smatram da je pažljivo upravljanje novcem veoma važno                                                               ",
+    "dim": "C4"
+  },
+  {
+    "id": 4,
+    "text": "Moj primarni cilj u donošenju odluka je da postignem najbolje rezultate  čak i ako to znači da zasenim ideje drugih ",
+    "dim": "C2"
+  },
+  {
+    "id": 5,
+    "text": "Nije poželjno da rukovodioci često traže mišljenje zaposlenih na nižim pozicijama                                   ",
+    "dim": "C2"
+  },
+  {
+    "id": 6,
+    "text": "Pridržavanje pravila i procedura je ključno za dobar rad                                                            ",
+    "dim": "C1"
+  },
+  {
+    "id": 7,
+    "text": "Čak i u teškim vremenima  ljudi bi trebalo da ostanu lojalni svojoj grupi                                           ",
+    "dim": "C3"
+  },
+  {
+    "id": 8,
+    "text": "Za mene je važno da istrajem i kada se suočavam sa otporom                                                          ",
+    "dim": "C4"
+  },
+  {
+    "id": 9,
+    "text": "Kako se ljudi osjećaju u procesu donošenja odluka nije važan faktor                                                 ",
+    "dim": "C2"
+  },
+  {
+    "id": 10,
+    "text": "Pravila i propisi mi pomažu da znam šta se od mene očekuje                                                          ",
+    "dim": "C1"
+  },
+  {
+    "id": 11,
+    "text": "Važnije je da grupa napreduje nego da se ističu pojedinci                                                           ",
+    "dim": "C3"
+  },
+  {
+    "id": 12,
+    "text": "Nije mi bitan uticaj odluka na osjećanja i odnose ljudi                                                             ",
+    "dim": "C2"
+  },
+  {
+    "id": 13,
+    "text": "Standardizovane procedure olakšavaju obavljanje posla                                                               ",
+    "dim": "C1"
+  },
+  {
+    "id": 14,
+    "text": "Bolje je kada uspije tim nego pojedinac                                                                             ",
+    "dim": "C3"
+  },
+  {
+    "id": 15,
+    "text": "Dugoročno planiranje mi je izuzetno značajno                                                                        ",
+    "dim": "C4"
+  },
+  {
+    "id": 16,
+    "text": "Zadovoljniji sam kada moje odluke dovedu do boljih rezultata od rezultata mojih kolega                              ",
+    "dim": "C2"
+  },
+  {
+    "id": 17,
+    "text": "Važne zadatke ne bi trebalo delegirati zaposlenima na nižim pozicijama                                              ",
+    "dim": "C2"
+  },
+  {
+    "id": 18,
+    "text": "Jasne procedure su ključne za uspješnu realizaciju zadataka                                                         ",
+    "dim": "C1"
+  },
+  {
+    "id": 19,
+    "text": "Prije nego što se posveti svojim ciljevima  pojedinac bi trebalo da razmisli o tome kako oni utiču na grupu         ",
+    "dim": "C3"
+  },
+  {
+    "id": 20,
+    "text": "Spreman sam da se odreknem zabave danas zarad budućeg uspjeha                                                       ",
+    "dim": "C4"
+  },
+  {
+    "id": 21,
+    "text": "Lojalnost prema grupi treba podsticati  čak i kada se kosi s ličnim ciljevima                                       ",
+    "dim": "C3"
+  },
+  {
+    "id": 22,
+    "text": "Naporan rad zarad uspjeha u budućnosti  za mene je važan                                                            ",
+    "dim": "C4"
+  }
+]
