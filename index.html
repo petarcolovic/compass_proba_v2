@@ -11,7 +11,6 @@
       --muted:#6c757d;
       --text:#333333;
       --accent:#38B000;
-      --accent2:#FFD100;
     }
     *{box-sizing:border-box}
     body{
@@ -54,9 +53,11 @@
     a{color:#38B000}
     .small{font-size:12px}
     .dim-desc{margin:12px 0;font-size:14px;line-height:1.4;text-align:left}
-    canvas{max-width:100%;height:auto;margin:20px auto;border:1px solid #ccc;display:block;}
     .legend{margin-top:10px;font-size:13px}
     .legend span{margin:0 10px}
+    .compass-bg{position:relative;display:inline-block}
+    .compass-bg img{width:400px;height:400px;display:block}
+    .compass-bg canvas{position:absolute;left:0;top:0}
   </style>
 </head>
 <body>
@@ -81,7 +82,10 @@
       <!-- Desna strana: rezultati -->
       <section id="output" class="card" aria-live="polite">
         <div class="result">
-          <canvas id="compassCanvas" width="400" height="400"></canvas>
+          <div class="compass-bg">
+            <img src="compass.svg" alt="Compass background"/>
+            <canvas id="compassCanvas" width="400" height="400"></canvas>
+          </div>
           <div id="legend"></div>
         </div>
         <div id="summary" class="best-card"></div>
@@ -91,85 +95,74 @@
   </div>
 
   <script>
-    // Pitanja se učitavaju iz JSON fajla
-    let ITEMS = [];
-    fetch("items.json")
-      .then(r => r.json())
-      .then(data => {
-        ITEMS = data;
-        renderQuestions();
-      });
+    let ITEMS=[], FIGURES=[];
+    Promise.all([
+      fetch("items.json").then(r=>r.json()),
+      fetch("figures.json").then(r=>r.json())
+    ]).then(([items,figures])=>{
+      ITEMS=items;FIGURES=figures;renderQuestions();
+    });
 
-    const NORMS = {
-      "C1": {"10":6.5,"11":15.1,"12":22.7,"13":28.0,"14":32.4,"15":37.2,"16":42.9,"17":47.9,"18":52.6,"19":57.9,"20":63.5,"21":69.6,"22":75.4,"23":81.4,"24":88.1,"25":100.0},
-      "C2": {"7":8.0,"8":15.2,"9":21.3,"10":26.0,"11":30.2,"12":34.8,"13":40.0,"14":44.6,"15":48.5,"16":52.5,"17":56.4,"18":60.0,"19":63.8,"20":67.5,"21":71.4,"22":76.1,"23":80.9,"24":85.7,"25":90.4,"26":95.2,"27":100.0},
-      "C3": {"7":5.7,"8":14.5,"9":20.8,"10":25.0,"11":27.8,"12":30.9,"13":33.8,"14":36.5,"15":40.1,"16":44.0,"17":48.1,"18":52.7,"19":56.5,"20":59.1,"21":62.3,"22":66.2,"23":69.6,"24":73.0,"25":76.2,"26":79.5,"27":83.3,"28":87.1,"29":91.8,"30":100.0},
-      "C4": {"12":8.6,"13":17.1,"14":24.2,"15":30.3,"16":36.3,"17":42.5,"18":48.8,"19":55.2,"20":61.7,"21":68.3,"22":74.8,"23":81.3,"24":88.7,"25":100.0}
+    const NORMS={
+      "C1":{"10":6.5,"11":15.1,"12":22.7,"13":28.0,"14":32.4,"15":37.2,"16":42.9,"17":47.9,"18":52.6,"19":57.9,"20":63.5,"21":69.6,"22":75.4,"23":81.4,"24":88.1,"25":100.0},
+      "C2":{"7":8.0,"8":15.2,"9":21.3,"10":26.0,"11":30.2,"12":34.8,"13":40.0,"14":44.6,"15":48.5,"16":52.5,"17":56.4,"18":60.0,"19":63.8,"20":67.5,"21":71.4,"22":76.1,"23":80.9,"24":85.7,"25":90.4,"26":95.2,"27":100.0},
+      "C3":{"7":5.7,"8":14.5,"9":20.8,"10":25.0,"11":27.8,"12":30.9,"13":33.8,"14":36.5,"15":40.1,"16":44.0,"17":48.1,"18":52.7,"19":56.5,"20":59.1,"21":62.3,"22":66.2,"23":69.6,"24":73.0,"25":76.2,"26":79.5,"27":83.3,"28":87.1,"29":91.8,"30":100.0},
+      "C4":{"12":8.6,"13":17.1,"14":24.2,"15":30.3,"16":36.3,"17":42.5,"18":48.8,"19":55.2,"20":61.7,"21":68.3,"22":74.8,"23":81.3,"24":88.7,"25":100.0}
     };
 
-    const DIMS_INFO = {
-      "C1": { "name":"Clarity & Compliance vs Agility","high":"Structured Culture – pravila, konzistentnost.","low":"Agile Culture – fleksibilnost, improvizacija."},
-      "C2": { "name":"Competitive Achievement","high":"Performance-Driven – ambicija i rezultati.","low":"Empathetic – fokus na harmoniju i saradnju."},
-      "C3": { "name":"Collective Loyalty","high":"Team-First – lojalnost, timski duh.","low":"Individualist – autonomija, samostalnost."},
-      "C4": { "name":"Commitment to Growth","high":"Growth-Oriented – planiranje i istrajnost.","low":"Present-Oriented – fokus na kratkoročne ciljeve."}
+    const DIMS_INFO={
+      "C1":{"name":"Clarity & Compliance vs Agility","high":"Structured Culture – pravila, konzistentnost.","low":"Agile Culture – fleksibilnost, improvizacija."},
+      "C2":{"name":"Competitive Achievement","high":"Performance-Driven – ambicija i rezultati.","low":"Empathetic – fokus na harmoniju i saradnju."},
+      "C3":{"name":"Collective Loyalty","high":"Team-First – lojalnost, timski duh.","low":"Individualist – autonomija, samostalnost."},
+      "C4":{"name":"Commitment to Growth","high":"Growth-Oriented – planiranje i istrajnost.","low":"Present-Oriented – kratkoročni ciljevi."}
     };
 
-    const FIGURES = [
-      {"name": "Queen Victoria","description": "Kraljica Engleske","wiki": "https://sh.wikipedia.org/wiki/Viktorija","profile": {"C1": 70, "C2": 50, "C3": 50, "C4": 50}},
-      {"name": "Napoleon","description": "Francuski imperator","wiki": "https://sh.wikipedia.org/wiki/Napoleon_I_Bonaparte","profile": {"C1": 50, "C2": 70, "C3": 50, "C4": 50}},
-      {"name": "Marie Therese","description": "Austrijska carica","wiki": "https://sh.wikipedia.org/wiki/Maria_Theresia","profile": {"C1": 50, "C2": 50, "C3": 70, "C4": 50}},
-      {"name": "Franklin Roosevelt","description": "Američki predsednik","wiki": "https://sh.wikipedia.org/wiki/Franklin_Delano_Roosevelt","profile": {"C1": 50, "C2": 50, "C3": 50, "C4": 70}}
-    ];
-
-    const qWrap = document.getElementById('questions');
+    const qWrap=document.getElementById('questions');
     function renderQuestions(){
-      qWrap.innerHTML = '';
-      ITEMS.forEach(q => {
-        const div = document.createElement('div');
-        div.className = 'q';
-        div.innerHTML = `
+      qWrap.innerHTML='';
+      ITEMS.forEach(q=>{
+        const div=document.createElement('div');
+        div.className='q';
+        div.innerHTML=`
           <h3>${q.id}. ${q.text}</h3>
           <div class="scale">
-            ${[1,2,3,4,5].map(v => `
-              <label>
-                <input type="radio" name="q_${q.id}" value="${v}" required /> ${v}
-              </label>`).join('')}
-          </div>
-        `;
+            ${[1,2,3,4,5].map(v=>`
+              <label><input type="radio" name="q_${q.id}" value="${v}" required /> ${v}</label>`).join('')}
+          </div>`;
         qWrap.appendChild(div);
       });
     }
 
     function computeRawScores(form){
-      const sums = {};
-      ITEMS.forEach(q => { sums[q.dim] = (sums[q.dim]||0) + Number(form.get(`q_${q.id}`)||0); });
+      const sums={};
+      ITEMS.forEach(q=>{sums[q.dim]=(sums[q.dim]||0)+Number(form.get(`q_${q.id}`)||0);});
       return sums;
     }
 
-    function normLookup(dim, raw){
-      const table = NORMS[dim];
-      if(!table) return 0;
-      let exact = table[String(raw)];
-      if(exact !== undefined) return exact;
-      const keys = Object.keys(table).map(k=>Number(k)).sort((a,b)=>a-b);
-      if(keys.length===0) return 0;
-      if(raw <= keys[0]) return table[String(keys[0])];
-      if(raw >= keys[keys.length-1]) return table[String(keys[keys.length-1])];
-      let i=0;
-      while(i<keys.length && keys[i] < raw) i++;
-      const k2 = keys[i], k1 = keys[i-1];
-      const v1 = table[String(k1)], v2 = table[String(k2)];
-      return v1 + (raw-k1)/(k2-k1)*(v2-v1);
+    function normLookup(dim,raw){
+      const t=NORMS[dim];if(!t)return 0;
+      if(t[String(raw)]!==undefined)return t[String(raw)];
+      const keys=Object.keys(t).map(Number).sort((a,b)=>a-b);
+      if(raw<=keys[0])return t[String(keys[0])];
+      if(raw>=keys[keys.length-1])return t[String(keys[keys.length-1])];
+      let i=0;while(i<keys.length&&keys[i]<raw)i++;
+      const k2=keys[i],k1=keys[i-1];return t[String(k1)]+(raw-k1)/(k2-k1)*(t[String(k2)]-t[String(k1)]);
     }
 
-    function distance(u,f){ return Math.sqrt(["C1","C2","C3","C4"].reduce((s,d)=>s+((u[d]||0)-(f[d]||0))**2,0)); }
+    // Koenova mera (Pearson)
+    function profileSimilarity(user,fig){
+      const dims=["C1","C2","C3","C4"];
+      const u=dims.map(d=>user[d]||0),f=dims.map(d=>fig[d]||0);
+      const mu=u.reduce((a,b)=>a+b,0)/u.length,mf=f.reduce((a,b)=>a+b,0)/f.length;
+      let num=0,du=0,df=0;
+      for(let i=0;i<dims.length;i++){num+=(u[i]-mu)*(f[i]-mf);du+=(u[i]-mu)**2;df+=(f[i]-mf)**2;}
+      return num/Math.sqrt(du*df);
+    }
 
-    function drawCompass(user, figure){
+    function drawCompass(user,figure){
       const c=document.getElementById('compassCanvas'),ctx=c.getContext('2d');
       ctx.clearRect(0,0,c.width,c.height);
       const R=c.width*0.36,CX=c.width/2,CY=c.height/2,dims=["C1","C2","C3","C4"],ang=[-Math.PI/2,0,Math.PI/2,Math.PI];
-      ctx.strokeStyle="#999";
-      dims.forEach((d,i)=>{const x=CX+R*Math.cos(ang[i]),y=CY+R*Math.sin(ang[i]);ctx.beginPath();ctx.moveTo(CX,CY);ctx.lineTo(x,y);ctx.stroke();ctx.fillStyle="#333";ctx.font="12px sans-serif";ctx.textAlign="center";ctx.fillText(DIMS_INFO[d].name,x,y+(i===0?-10:i===2?20:0));});
       function poly(o,col){ctx.beginPath();dims.forEach((d,i)=>{const r=(o[d]||0)/100*R,x=CX+r*Math.cos(ang[i]),y=CY+r*Math.sin(ang[i]);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});ctx.closePath();ctx.fillStyle=col.replace("1)",".3)");ctx.fill();ctx.strokeStyle=col;ctx.lineWidth=2;ctx.stroke();}
       poly(user,"rgba(56,176,0,1)");poly(figure,"rgba(255,110,110,1)");
     }
@@ -179,24 +172,23 @@
       e.preventDefault();
       const data=new FormData(form),raw=computeRawScores(data),dims=["C1","C2","C3","C4"],normed={};
       dims.forEach(d=>normed[d]=Number(normLookup(d,raw[d]||0).toFixed(2)));
-      let best=null,worst=null,bestDist=Infinity,worstDist=-Infinity;
-      FIGURES.forEach(f=>{const dist=distance(normed,f.profile);if(dist<bestDist){bestDist=dist;best=f;}if(dist>worstDist){worstDist=dist;worst=f;}});
+      let best=null,worst=null,bestSim=-Infinity,worstSim=Infinity;
+      FIGURES.forEach(f=>{const sim=profileSimilarity(normed,f.profile);if(sim>bestSim){bestSim=sim;best=f;}if(sim<worstSim){worstSim=sim;worst=f;}});
+
       drawCompass(normed,best.profile);
       legendDiv.innerHTML='<span style="color:#38B000">■ Tvoj profil</span><span style="color:#ff6e6e">■ '+best.name+'</span>';
-      summaryDiv.innerHTML=`<h2>Najsličniji si: ${best.name}</h2><p>${best.description}</p>${best.wiki?`<p><a href="${best.wiki}" target="_blank">Pročitaj više →</a></p>`:""}
-      <h3>Najmanje sličan si: ${worst.name}</h3><p>${worst.description}</p>`;
-      detailsDiv.innerHTML="";dims.forEach(d=>{detailsDiv.innerHTML+=`<div class="dim-desc"><strong>${d} - ${DIMS_INFO[d].name}</strong>: ${normed[d]}<div><em>Visok skor:</em> ${DIMS_INFO[d].high}</div><div><em>Nizak skor:</em> ${DIMS_INFO[d].low}</div></div>`;});
+      summaryDiv.innerHTML=`
+        <h2>Najsličniji si: ${best.name}</h2><p>${best.description}</p>
+        <p><strong>Sličnost (Koen):</strong> ${bestSim.toFixed(2)}</p>
+        ${best.wiki?`<p><a href="${best.wiki}" target="_blank">Pročitaj više →</a></p>`:""}
+        <h3>Najmanje sličan si: ${worst.name}</h3><p>${worst.description}</p>
+        <p><strong>Sličnost (Koen):</strong> ${worstSim.toFixed(2)}</p>`;
+      detailsDiv.innerHTML="";dims.forEach(d=>{detailsDiv.innerHTML+=`<div class="dim-desc"><strong>${d} - ${DIMS_INFO[d].name}</strong>: ${normed[d]}
+        <div><em>Visok skor:</em> ${DIMS_INFO[d].high}</div><div><em>Nizak skor:</em> ${DIMS_INFO[d].low}</div></div>`;});
       window.scrollTo({top:0,behavior:'smooth'});
     });
 
-    document.getElementById('resetBtn').addEventListener('click',()=>{
-      form.reset();
-      const ctx=document.getElementById('compassCanvas').getContext('2d');
-      ctx.clearRect(0,0,400,400);
-      legendDiv.innerHTML="";
-      summaryDiv.innerHTML="";
-      detailsDiv.innerHTML="";
-    });
+    document.getElementById('resetBtn').addEventListener('click',()=>{form.reset();const ctx=document.getElementById('compassCanvas').getContext('2d');ctx.clearRect(0,0,400,400);legendDiv.innerHTML="";summaryDiv.innerHTML="";detailsDiv.innerHTML="";});
   </script>
 </body>
 </html>
