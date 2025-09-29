@@ -6,11 +6,11 @@
   <title>The 4C Culture Compass™ by Recrewty</title>
   <style>
     body { margin:0; font-family: Arial, sans-serif; background:#fff; color:#333; }
-    .wrap { max-width:1000px; margin:auto; padding:24px; }
-    header { display:flex; align-items:center; gap:12px; margin:8px 0 24px; }
-    header img { height:40px; }
-    h1 { margin:0; font-size:24px; }
-    .card { background:#f8f9fa; border:1px solid #ddd; border-radius:12px; padding:16px; margin-bottom:20px; }
+    .wrap { max-width:1200px; margin:auto; padding:24px; }
+    header { text-align:center; margin:8px 0 24px; }
+    h1 { margin:0; font-size:28px; color:#38B000; }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+    .card { background:#f8f9fa; border:1px solid #ddd; border-radius:12px; padding:16px; }
     .q { margin-bottom:16px; }
     .q h3 { font-size:16px; margin:0 0 8px; }
     .scale { display:flex; gap:10px; flex-wrap:wrap; }
@@ -19,39 +19,45 @@
     .scale input { accent-color:#38B000; }
     .actions { margin-top:20px; display:flex; gap:12px; }
     button { background:#38B000; border:none; color:#fff; padding:8px 14px; border-radius:8px; font-weight:bold; cursor:pointer; }
-    canvas { max-width:100%; height:auto; border:1px solid #ccc; margin-top:20px; }
-    .legend { margin-top:10px; font-size:14px; }
-    .legend span { margin-right:12px; }
+    canvas { max-width:100%; height:auto; border:1px solid #ccc; margin-bottom:16px; }
+    .legend { margin-top:10px; font-size:14px; text-align:center; }
+    .result-info { margin-top:12px; font-size:16px; text-align:center; }
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <img src="recrewty-logo-white.png" alt="Recrewty logo"/>
       <h1>The 4C Culture Compass™ by Recrewty</h1>
     </header>
 
-    <form id="quiz" class="card">
-      <p>Odgovori na svaku tvrdnju (1 = nimalo • 5 = u potpunosti):</p>
-      <div id="questions"></div>
-      <div class="actions">
-        <button type="submit">Pošalji</button>
-        <button type="button" id="resetBtn">Poništi</button>
-      </div>
-    </form>
+    <div class="grid">
+      <!-- Leva kolona: pitanja -->
+      <form id="quiz" class="card">
+        <p>Odgovori na svaku tvrdnju (1 = nimalo • 5 = u potpunosti):</p>
+        <div id="questions"></div>
+        <div class="actions">
+          <button type="submit">Pošalji</button>
+          <button type="button" id="resetBtn">Poništi</button>
+        </div>
+      </form>
 
-    <section class="card">
-      <h2>Rezultat</h2>
-      <canvas id="compassCanvas" width="500" height="500"></canvas>
-      <div id="legend"></div>
-    </section>
+      <!-- Desna kolona: kompas i rezultati -->
+      <div class="card">
+        <canvas id="compassCanvas" width="400" height="400"></canvas>
+        <div id="legend"></div>
+        <div class="result-info">
+          <p><strong>Najsličniji:</strong> <span id="mostSimilar">–</span></p>
+          <p><strong>Najmanje sličan:</strong> <span id="leastSimilar">–</span></p>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
     let ITEMS = [];
     let FIGURES = [];
 
-    // Učitaj stavke i ličnosti
+    // Učitaj pitanja i ličnosti
     Promise.all([
       fetch("items.json").then(r => r.json()),
       fetch("figures.json").then(r => r.json())
@@ -89,7 +95,7 @@
       return sums;
     }
 
-    // Koenova mera sličnosti
+    // Koenova mera
     function cohensCorrelation(user, fig){
       const dims=["C1","C2","C3","C4"];
       const u = dims.map(d=>user[d]);
@@ -115,7 +121,7 @@
 
         const dims=["C1","C2","C3","C4"];
         const angles={C1:-Math.PI/2,C2:0,C3:Math.PI/2,C4:Math.PI};
-        const radius=200, cx=250, cy=250;
+        const radius=160, cx=200, cy=200;
 
         function drawPoly(profile,color){
           ctx.beginPath();
@@ -139,30 +145,36 @@
       };
     }
 
-    // Rukovanje formom
+    // Forma
     const form=document.getElementById("quiz");
     form.addEventListener("submit",e=>{
       e.preventDefault();
       const data=new FormData(form);
       const scores=computeScores(data);
 
-      let best=null, bestSim=-2;
+      // Nađi najsličniju i najmanje sličnu
+      let best=null, worst=null, bestSim=-2, worstSim=2;
       FIGURES.forEach(f=>{
         const sim=cohensCorrelation(scores,f.profile);
         if(sim>bestSim){bestSim=sim;best=f;}
+        if(sim<worstSim){worstSim=sim;worst=f;}
       });
 
       drawCompass(scores,best.profile);
       document.getElementById("legend").innerHTML=
         `<span style="color:#38B000">■ Tvoj profil</span>
-         <span style="color:#ff6e6e">■ ${best.name} (sličnost=${bestSim.toFixed(2)})</span>`;
+         <span style="color:#ff6e6e">■ ${best.name}</span>`;
+      document.getElementById("mostSimilar").textContent = `${best.name} (${bestSim.toFixed(2)})`;
+      document.getElementById("leastSimilar").textContent = `${worst.name} (${worstSim.toFixed(2)})`;
     });
 
     document.getElementById("resetBtn").addEventListener("click",()=>{
       form.reset();
       const ctx=document.getElementById("compassCanvas").getContext("2d");
-      ctx.clearRect(0,0,500,500);
+      ctx.clearRect(0,0,400,400);
       document.getElementById("legend").innerHTML="";
+      document.getElementById("mostSimilar").textContent="–";
+      document.getElementById("leastSimilar").textContent="–";
     });
   </script>
 </body>
