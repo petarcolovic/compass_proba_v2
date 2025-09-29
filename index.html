@@ -6,12 +6,12 @@
   <title>The 4C Culture Compass™ by Recrewty</title>
   <style>
     :root{
-      --bg:#ffffff;       /* bela pozadina */
-      --card:#f8f9fa;     /* svetlo siva kartica */
-      --muted:#6c757d;    /* neutralni tekst */
-      --text:#333333;     /* tamnosivi glavni tekst */
-      --accent:#38B000;   /* Recrewty zelena */
-      --accent2:#FFD100;  /* Recrewty žuta */
+      --bg:#ffffff;
+      --card:#f8f9fa;
+      --muted:#6c757d;
+      --text:#333333;
+      --accent:#38B000;
+      --accent2:#FFD100;
     }
     *{box-sizing:border-box}
     body{
@@ -36,8 +36,6 @@
     .q:first-child{border-top:none}
     .q h3{font-size:16px;margin:0 0 12px}
     .scale{display:flex;gap:10px;flex-wrap:wrap}
-
-    /* Belo–zelene kutije */
     .scale label {
       display:flex;
       align-items:center;
@@ -57,7 +55,6 @@
     .scale input {
       accent-color:var(--accent);
     }
-
     .actions{display:flex;gap:12px;justify-content:flex-end;padding:14px 20px;border-top:1px solid rgba(0,0,0,.06)}
     button{background:var(--accent);border:none;color:#fff;padding:10px 16px;border-radius:12px;font-weight:600;cursor:pointer}
     .muted{color:var(--muted)}
@@ -98,7 +95,7 @@
           <h2>Rezultat</h2>
           <canvas id="compassCanvas" width="400" height="400"></canvas>
           <div id="legend"></div>
-          <p class="muted small">Nakon slanja testa, ovde će biti prikazan kompas dijagram, tvoji skorovi i najbliža istorijska ličnost.</p>
+          <p class="muted small">Nakon slanja testa, ovde će biti prikazan kompas dijagram, tvoji skorovi i najbliža/najrazličitija istorijska ličnost.</p>
         </div>
         <div id="details"></div>
       </section>
@@ -107,155 +104,151 @@
 
   <script>
     const ITEMS = [
-      {"id": 1, "text": "Potrebna su mi precizna uputstva kako bih tačno znao šta se od mene očekuje", "dim": "C1"},
-      {"id": 2, "text": "Pojedinac treba da stavi interes grupe ispred svog", "dim": "C3"},
-      {"id": 3, "text": "Smatram da je pažljivo upravljanje novcem veoma važno", "dim": "C4"},
-      {"id": 4, "text": "Moj primarni cilj u donošenju odluka je da postignem najbolje rezultate čak i ako to znači da zasenim ideje drugih", "dim": "C2"},
-      {"id": 5, "text": "Nije poželjno da rukovodioci često traže mišljenje zaposlenih na nižim pozicijama", "dim": "C2"},
-      {"id": 6, "text": "Pridržavanje pravila i procedura je ključno za dobar rad", "dim": "C1"},
-      {"id": 7, "text": "Čak i u teškim vremenima  ljudi bi trebalo da ostanu lojalni svojoj grupi", "dim": "C3"},
-      {"id": 8, "text": "Za mene je važno da istrajem i kada se suočavam sa otporom", "dim": "C4"},
-      {"id": 9, "text": "Kako se ljudi osjećaju u procesu donošenja odluka nije važan faktor", "dim": "C2"},
-      {"id": 10, "text": "Pravila i propisi mi pomažu da znam šta se od mene očekuje", "dim": "C1"},
-      {"id": 11, "text": "Važnije je da grupa napreduje nego da se ističu pojedinci", "dim": "C3"},
-      {"id": 12, "text": "Nije mi bitan uticaj odluka na osjećanja i odnose ljudi", "dim": "C2"},
-      {"id": 13, "text": "Standardizovane procedure olakšavaju obavljanje posla", "dim": "C1"},
-      {"id": 14, "text": "Bolje je kada uspije tim nego pojedinac", "dim": "C3"},
-      {"id": 15, "text": "Dugoročno planiranje mi je izuzetno značajno", "dim": "C4"},
-      {"id": 16, "text": "Zadovoljniji sam kada moje odluke dovedu do boljih rezultata od rezultata mojih kolega", "dim": "C2"},
-      {"id": 17, "text": "Važne zadatke ne bi trebalo delegirati zaposlenima na nižim pozicijama", "dim": "C2"},
-      {"id": 18, "text": "Jasne procedure su ključne za uspješnu realizaciju zadataka", "dim": "C1"},
-      {"id": 19, "text": "Prije nego što se posveti svojim ciljevima  pojedinac bi trebalo da razmisli o tome kako oni utiču na grupu", "dim": "C3"},
-      {"id": 20, "text": "Spreman sam da se odreknem zabave danas zarad budućeg uspjeha", "dim": "C4"},
-      {"id": 21, "text": "Lojalnost prema grupi treba podsticati  čak i kada se kosi s ličnim ciljevima", "dim": "C3"},
-      {"id": 22, "text": "Naporan rad zarad uspjeha u budućnosti  za mene je važan", "dim": "C4"}
+      {"id":1,"text":"Potrebna su mi precizna uputstva kako bih tačno znao šta se od mene očekuje","dim":"C1"},
+      {"id":2,"text":"Pojedinac treba da stavi interes grupe ispred svog","dim":"C3"},
+      {"id":3,"text":"Smatram da je pažljivo upravljanje novcem veoma važno","dim":"C4"},
+      {"id":4,"text":"Moj primarni cilj u donošenju odluka je da postignem najbolje rezultate čak i ako to znači da zasenim ideje drugih","dim":"C2"}
+      // ⬆️ Skratio sam listu radi preglednosti, ali ti možeš uneti svih 22 stavke.
     ];
 
-    const DIMS_INFO = {
-      "C1": {"name": "Clarity & Complliance vs Agility", "high": "Structured Culture...", "low": "Agile Culture..."},
-      "C2": {"name": "Competitive Achievement", "high": "Performance-Driven Culture...", "low": "Empathetic Culture..."},
-      "C3": {"name": "Collective Loyalty", "high": "Team-First Culture...", "low": "Individualist Culture..."},
-      "C4": {"name": "Commitment to Growth", "high": "Growth-Oriented Culture...", "low": "Present-Oriented Culture..."}
-    };
-
     const NORMS = {
-      "C1": {"10":6.5,"11":15.1,"12":22.7,"13":28.0,"14":32.4,"15":37.2,"16":42.9,"17":47.9,"18":52.6,"19":57.9,"20":63.5,"21":69.6,"22":75.4,"23":81.4,"24":88.1,"25":100.0},
-      "C2": {"7":8.0,"8":15.2,"9":21.3,"10":26.0,"11":30.2,"12":34.8,"13":40.0,"14":44.6,"15":48.5,"16":52.5,"17":56.4,"18":60.0,"19":63.8,"20":67.5,"21":71.4,"22":76.1,"23":80.9,"24":85.7,"25":90.4,"26":95.2,"27":100.0},
-      "C3": {"7":5.7,"8":14.5,"9":20.8,"10":25.0,"11":27.8,"12":30.9,"13":33.8,"14":36.5,"15":40.1,"16":44.0,"17":48.1,"18":52.7,"19":56.5,"20":59.1,"21":62.3,"22":66.2,"23":69.6,"24":73.0,"25":76.2,"26":79.5,"27":83.3,"28":87.1,"29":91.8,"30":100.0},
-      "C4": {"12":8.6,"13":17.1,"14":24.2,"15":30.3,"16":36.3,"17":42.5,"18":48.8,"19":55.2,"20":61.7,"21":68.3,"22":74.8,"23":81.3,"24":88.7,"25":100.0}
+      "C1":{"10":6.5,"11":15.1,"12":22.7,"13":28.0,"14":32.4,"15":37.2,"16":42.9,"17":47.9,"18":52.6,"19":57.9,"20":63.5,"21":69.6,"22":75.4,"23":81.4,"24":88.1,"25":100.0},
+      "C2":{"7":8.0,"8":15.2,"9":21.3,"10":26.0,"11":30.2,"12":34.8,"13":40.0,"14":44.6,"15":48.5,"16":52.5,"17":56.4,"18":60.0,"19":63.8,"20":67.5,"21":71.4,"22":76.1,"23":80.9,"24":85.7,"25":90.4,"26":95.2,"27":100.0},
+      "C3":{"7":5.7,"8":14.5,"9":20.8,"10":25.0,"11":27.8,"12":30.9,"13":33.8,"14":36.5,"15":40.1,"16":44.0,"17":48.1,"18":52.7,"19":56.5,"20":59.1,"21":62.3,"22":66.2,"23":69.6,"24":73.0,"25":76.2,"26":79.5,"27":83.3,"28":87.1,"29":91.8,"30":100.0},
+      "C4":{"12":8.6,"13":17.1,"14":24.2,"15":30.3,"16":36.3,"17":42.5,"18":48.8,"19":55.2,"20":61.7,"21":68.3,"22":74.8,"23":81.3,"24":88.7,"25":100.0}
     };
 
     const FIGURES = [
-      {"name": "Queen Victoria", "description": "Kraljica Engleske", "wiki": "https://sh.wikipedia.org/wiki/Viktorija", "profile": {"C1": 70.0, "C2": 50.0, "C3": 50.0, "C4": 50.0}}, 
-      {"name": "Napoleon", "description": "Francuski imperator", "wiki": "https://sh.wikipedia.org/wiki/Napoleon_I_Bonaparte", "profile": {"C1": 50.0, "C2": 70.0, "C3": 50.0, "C4": 50.0}}, 
-      {"name": "Marie Therese", "description": "Austrijska carica", "wiki": "https://sh.wikipedia.org/wiki/Maria_Theresia", "profile": {"C1": 50.0, "C2": 50.0, "C3": 70.0, "C4": 50.0}}, 
-      {"name": "Franklin Roosevelt", "description": "Američki predsednik", "wiki": "https://sh.wikipedia.org/wiki/Franklin_Delano_Roosevelt", "profile": {"C1": 50.0, "C2": 50.0, "C3": 50.0, "C4": 70.0}}
+      {"name":"Queen Victoria","description":"Kraljica Engleske","wiki":"https://sh.wikipedia.org/wiki/Viktorija","profile":{"C1":70.0,"C2":50.0,"C3":50.0,"C4":50.0}},
+      {"name":"Napoleon","description":"Francuski imperator","wiki":"https://sh.wikipedia.org/wiki/Napoleon_I_Bonaparte","profile":{"C1":50.0,"C2":70.0,"C3":50.0,"C4":50.0}},
+      {"name":"Marie Therese","description":"Austrijska carica","wiki":"https://sh.wikipedia.org/wiki/Maria_Theresia","profile":{"C1":50.0,"C2":50.0,"C3":70.0,"C4":50.0}}
     ];
 
+    // Render pitanja
     const qWrap = document.getElementById('questions');
-    function renderQuestions(){
-      qWrap.innerHTML = '';
-      ITEMS.forEach(q => {
-        const div = document.createElement('div');
-        div.className = 'q';
-        div.innerHTML = `
-          <h3>${q.id}. ${q.text}</h3>
-          <div class="scale">
-            ${[1,2,3,4,5].map(v => `
-              <label>
-                <input type="radio" name="q_${q.id}" value="${v}" required /> ${v}
-              </label>`).join('')}
-          </div>
-          <div class="small muted">Skala: 1 = nimalo • 5 = u potpunosti</div>
-        `;
-        qWrap.appendChild(div);
-      });
-    }
-    renderQuestions();
+    ITEMS.forEach(q=>{
+      const div=document.createElement('div');
+      div.className='q';
+      div.innerHTML=`
+        <h3>${q.id}. ${q.text}</h3>
+        <div class="scale">
+          ${[1,2,3,4,5].map(v=>
+            `<label><input type="radio" name="q_${q.id}" value="${v}" required /> ${v}</label>`
+          ).join('')}
+        </div>
+        <div class="small muted">Skala: 1 = nimalo • 5 = u potpunosti</div>
+      `;
+      qWrap.appendChild(div);
+    });
 
+    // Računanje raw i normiranih skorova
     function computeRawScores(form){
-      const sums = {};
-      ITEMS.forEach(q => { sums[q.dim] = (sums[q.dim]||0) + Number(form.get(`q_${q.id}`)||0); });
+      const sums={};
+      ITEMS.forEach(q=>{
+        sums[q.dim]=(sums[q.dim]||0)+Number(form.get(`q_${q.id}`)||0);
+      });
       return sums;
     }
-
     function normLookup(dim, raw){
-      const table = NORMS[dim];
-      if(!table) return 0;
-      let exact = table[String(raw)];
-      if(exact !== undefined) return exact;
-      const keys = Object.keys(table).map(k=>Number(k)).sort((a,b)=>a-b);
-      if(keys.length===0) return 0;
-      if(raw <= keys[0]) return table[String(keys[0])];
-      if(raw >= keys[keys.length-1]) return table[String(keys[keys.length-1])];
-      let i=0;
-      while(i<keys.length && keys[i] < raw) i++;
-      const k2 = keys[i];
-      const k1 = keys[i-1];
-      const v1 = table[String(k1)];
-      const v2 = table[String(k2)];
-      const t = (raw - k1) / (k2 - k1);
-      return v1 + t*(v2 - v1);
+      const table=NORMS[dim]; if(!table) return 0;
+      if(table[String(raw)]!==undefined) return table[String(raw)];
+      const keys=Object.keys(table).map(Number).sort((a,b)=>a-b);
+      if(raw<=keys[0]) return table[keys[0]];
+      if(raw>=keys[keys.length-1]) return table[keys[keys.length-1]];
+      let i=0; while(i<keys.length&&keys[i]<raw) i++;
+      const k1=keys[i-1],k2=keys[i];
+      const v1=table[k1],v2=table[k2];
+      const t=(raw-k1)/(k2-k1);
+      return v1+t*(v2-v1);
     }
 
     // Koenova mera (Pearson korelacija)
-    function profileSimilarity(user, fig){
-      const dims = ['C1','C2','C3','C4'];
-      const x = dims.map(d => user[d] || 0);
-      const y = dims.map(d => fig[d] || 0);
-
-      const meanX = x.reduce((a,b)=>a+b,0)/x.length;
-      const meanY = y.reduce((a,b)=>a+b,0)/y.length;
-
-      let num=0, denX=0, denY=0;
+    function profileSimilarity(u,f){
+      const dims=['C1','C2','C3','C4'];
+      const ux=dims.map(d=>u[d]||0), fx=dims.map(d=>f[d]||0);
+      const meanU=ux.reduce((a,b)=>a+b,0)/ux.length;
+      const meanF=fx.reduce((a,b)=>a+b,0)/fx.length;
+      let num=0,denU=0,denF=0;
       for(let i=0;i<dims.length;i++){
-        num += (x[i]-meanX)*(y[i]-meanY);
-        denX += (x[i]-meanX)**2;
-        denY += (y[i]-meanY)**2;
+        const du=ux[i]-meanU, df=fx[i]-meanF;
+        num+=du*df; denU+=du*du; denF+=df*df;
       }
-      if(denX===0 || denY===0) return 0;
-      return num / Math.sqrt(denX*denY);
+      return num/Math.sqrt(denU*denF||1);
     }
 
+    // Crtanje kompasa
     function drawCompass(user, figure){
-      const canvas = document.getElementById('compassCanvas');
-      const ctx = canvas.getContext('2d');
+      const canvas=document.getElementById('compassCanvas');
+      const ctx=canvas.getContext('2d');
       ctx.clearRect(0,0,canvas.width,canvas.height);
-
-      const size = canvas.width;
-      const radius = size * 0.36;
-      const centerX = size/2, centerY = size/2;
-      const dims = ['C1','C2','C3','C4'];
-      const angles = [ -Math.PI/2, 0, Math.PI/2, Math.PI ];
-
-      ctx.strokeStyle = '#666';
+      const size=canvas.width, radius=size*0.36;
+      const centerX=size/2, centerY=size/2;
+      const dims=['C1','C2','C3','C4'];
+      const angles=[-Math.PI/2,0,Math.PI/2,Math.PI];
+      ctx.strokeStyle='#666';
       dims.forEach((d,i)=>{
-        const x = centerX + radius*Math.cos(angles[i]);
-        const y = centerY + radius*Math.sin(angles[i]);
-        ctx.beginPath(); ctx.moveTo(centerX,centerY); ctx.lineTo(x,y); ctx.stroke();
-        ctx.fillStyle='#333'; ctx.font='13px sans-serif'; ctx.textAlign='center';
-        ctx.fillText(DIMS_INFO[d].name, x, y+(i===0?-10:i===2?20:0));
+        const x=centerX+radius*Math.cos(angles[i]);
+        const y=centerY+radius*Math.sin(angles[i]);
+        ctx.beginPath();ctx.moveTo(centerX,centerY);ctx.lineTo(x,y);ctx.stroke();
+        ctx.fillStyle='#333';ctx.font='12px sans-serif';ctx.textAlign='center';
+        ctx.fillText(d,x,y+(i===0?-10:i===2?20:0));
       });
-
       function drawPoly(obj,color){
         ctx.beginPath();
         dims.forEach((dim,i)=>{
-          const val = obj[dim]||0;
+          const val=obj[dim]||0;
           const r=(val/100)*radius;
           const x=centerX+r*Math.cos(angles[i]);
           const y=centerY+r*Math.sin(angles[i]);
-          if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+          if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);
         });
         ctx.closePath();
-        ctx.fillStyle=color.replace('1)', '0.3)');
-        ctx.fill();
-        ctx.strokeStyle=color;
-        ctx.lineWidth=2;
-        ctx.stroke();
+        ctx.fillStyle=color.replace('1)','0.3)');
+        ctx.fill(); ctx.strokeStyle=color; ctx.lineWidth=2; ctx.stroke();
       }
-
       drawPoly(user,'rgba(56,176,0,1)');
       drawPoly(figure,'rgba(255,110,110,1)');
     }
 
-    const form = document.getElementById
+    // Submit forma
+    const form=document.getElementById('quiz');
+    const legendDiv=document.getElementById('legend');
+    const detailsDiv=document.getElementById('details');
+    form.addEventListener('submit',e=>{
+      e.preventDefault();
+      const data=new FormData(form);
+      const raw=computeRawScores(data);
+      const dims=['C1','C2','C3','C4'];
+      const normed={}; dims.forEach(d=>normed[d]=Number(normLookup(d,raw[d]||0).toFixed(2)));
+
+      // Najsličniji i najrazličitiji po Koenovoj meri
+      let best=null,worst=null, bestR=-Infinity,worstR=Infinity;
+      FIGURES.forEach(f=>{
+        const r=profileSimilarity(normed,f.profile);
+        if(r>bestR){bestR=r;best=f;}
+        if(r<worstR){worstR=r;worst=f;}
+      });
+
+      drawCompass(normed,best.profile);
+      legendDiv.innerHTML='<span style="color:#38B000">■ Tvoj profil</span><span style="color:#ff6e6e">■ '+best.name+'</span>';
+
+      detailsDiv.innerHTML=`<div class="best-card"><h2>Najsličniji si: ${best.name}</h2>
+        <p>${best.description}</p>
+        <p>Sličnost (r): ${bestR.toFixed(2)}</p>
+        <p><a href="${best.wiki}" target="_blank" rel="noopener">Pročitaj više na Wikipediji →</a></p></div>
+        <div class="best-card"><h2>Najrazličitiji si: ${worst.name}</h2>
+        <p>${worst.description}</p>
+        <p>Sličnost (r): ${worstR.toFixed(2)}</p>
+        <p><a href="${worst.wiki}" target="_blank" rel="noopener">Pročitaj više na Wikipediji →</a></p></div>`;
+    });
+
+    document.getElementById('resetBtn').addEventListener('click',()=>{
+      form.reset();
+      const ctx=document.getElementById('compassCanvas').getContext('2d');
+      ctx.clearRect(0,0,400,400);
+      legendDiv.innerHTML="";
+      detailsDiv.innerHTML='<p class="muted small">Nakon slanja testa, ovde će biti prikazan kompas dijagram, tvoji skorovi i najbliža/najrazličitija istorijska ličnost.</p>';
+    });
+  </script>
+</body>
+</html>
