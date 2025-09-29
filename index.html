@@ -5,43 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The 4C Culture Compass™ by Recrewty</title>
   <style>
-    :root{
-      --bg:#ffffff;
-      --card:#f8f9fa;
-      --muted:#6c757d;
-      --text:#333333;
-      --accent:#38B000;  /* Recrewty zelena */
-      --accent2:#FFD100; /* Recrewty žuta */
-    }
-    *{box-sizing:border-box}
-    body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;line-height:1.5;}
-    .wrap{max-width:1000px;margin:auto;padding:24px}
-    header{display:flex;align-items:center;gap:12px;margin:8px 0 24px}
-    header img{height:40px}
-    h1{font-size:24px;margin:0}
-    .card{background:var(--card);border:1px solid rgba(0,0,0,.06);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.1);}
-    .intro{padding:16px 20px;margin-bottom:16px}
-    .q{padding:16px 20px;border-top:1px solid rgba(0,0,0,.06);}
-    .q:first-child{border-top:none}
-    .q h3{font-size:16px;margin:0 0 12px}
-    .scale{display:flex;gap:10px;flex-wrap:wrap}
-    .scale label{display:flex;align-items:center;gap:8px;background:#ffffff;border:2px solid var(--accent);color:#333;padding:8px 12px;border-radius:12px;cursor:pointer;transition:all .2s ease}
-    .scale label:hover{background:var(--accent);color:#fff}
-    .scale input{accent-color:var(--accent)}
-    .actions{display:flex;gap:12px;justify-content:flex-end;padding:14px 20px;border-top:1px solid rgba(0,0,0,.06)}
-    button{background:var(--accent);border:none;color:#fff;padding:10px 16px;border-radius:12px;font-weight:600;cursor:pointer}
-    .muted{color:var(--muted)}
-    .grid{display:grid;grid-template-columns:1fr;gap:16px}
-    @media (min-width: 980px){ .grid{grid-template-columns:1.2fr .8fr} }
-    .result{padding:16px 20px;text-align:center}
-    .best-card{padding:16px 20px;border-top:1px solid rgba(0,0,0,.06);text-align:left}
-    .best-card h2{margin:0 0 6px}
-    a{color:#38B000}
-    .small{font-size:12px}
-    .dim-desc{margin:8px 0 16px;font-size:13px;line-height:1.4;text-align:left}
-    canvas{max-width:100%;height:auto;margin-top:20px;border:1px solid #ccc;}
-    .legend{margin-top:10px;font-size:13px}
-    .legend span{margin:0 10px}
+    body { margin:0; font-family: Arial, sans-serif; background:#fff; color:#333; }
+    .wrap { max-width:1000px; margin:auto; padding:24px; }
+    header { display:flex; align-items:center; gap:12px; margin:8px 0 24px; }
+    header img { height:40px; }
+    h1 { margin:0; font-size:24px; }
+    .card { background:#f8f9fa; border:1px solid #ddd; border-radius:12px; padding:16px; margin-bottom:20px; }
+    .q { margin-bottom:16px; }
+    .q h3 { font-size:16px; margin:0 0 8px; }
+    .scale { display:flex; gap:10px; flex-wrap:wrap; }
+    .scale label { background:#fff; border:2px solid #38B000; border-radius:8px; padding:6px 10px; cursor:pointer; transition:all .2s; }
+    .scale label:hover { background:#38B000; color:#fff; }
+    .scale input { accent-color:#38B000; }
+    .actions { margin-top:20px; display:flex; gap:12px; }
+    button { background:#38B000; border:none; color:#fff; padding:8px 14px; border-radius:8px; font-weight:bold; cursor:pointer; }
+    canvas { max-width:100%; height:auto; border:1px solid #ccc; margin-top:20px; }
+    .legend { margin-top:10px; font-size:14px; }
+    .legend span { margin-right:12px; }
   </style>
 </head>
 <body>
@@ -51,233 +31,138 @@
       <h1>The 4C Culture Compass™ by Recrewty</h1>
     </header>
 
-    <div class="grid">
-      <form id="quiz" class="card">
-        <div class="intro">
-          <p class="muted">Odgovori za svaku tvrdnju od 1 (uopšte se ne slažem) do 5 (u potpunosti se slažem).</p>
-        </div>
-        <div id="questions"></div>
-        <div class="actions">
-          <button type="submit">Pošalji</button>
-          <button type="button" id="resetBtn" class="muted" style="background:transparent;color:var(--text);border:1px solid rgba(0,0,0,.12)">Poništi</button>
-        </div>
-      </form>
+    <form id="quiz" class="card">
+      <p>Odgovori na svaku tvrdnju (1 = nimalo • 5 = u potpunosti):</p>
+      <div id="questions"></div>
+      <div class="actions">
+        <button type="submit">Pošalji</button>
+        <button type="button" id="resetBtn">Poništi</button>
+      </div>
+    </form>
 
-      <section id="output" class="card" aria-live="polite">
-        <div class="result">
-          <h2>Rezultat</h2>
-          <canvas id="compassCanvas" width="400" height="400"></canvas>
-          <div id="legend"></div>
-          <p class="muted small">Nakon slanja testa, ovde će biti prikazan kompas dijagram, tvoji skorovi i najsličnija/najrazličitija istorijska ličnost.</p>
-        </div>
-        <div id="details"></div>
-      </section>
-    </div>
+    <section class="card">
+      <h2>Rezultat</h2>
+      <canvas id="compassCanvas" width="500" height="500"></canvas>
+      <div id="legend"></div>
+    </section>
   </div>
 
-  /* ----- STAVKE TESTA (22) ----- */
+  <script>
+    let ITEMS = [];
+    let FIGURES = [];
 
-<script>
-let ITEMS = [];
-
-fetch("items.json")
-  .then(r => r.json())
-  .then(data => {
-    ITEMS = data;
-    console.log("Učitane stavke:", ITEMS);
-    renderQuestions(); // funkcija koja prikazuje pitanja
-  });
-</script>
-
-  
-    /* ----- OPISI DIMENZIJA (po potrebi možeš dopuniti/promeniti) ----- */
-    const DIMS_INFO = {
-      "C1": {"name": "Clarity & Compliance vs Agility", "high":"Structured Culture – naglašava pravila, konzistentnost, SOPs.","low":"Agile Culture – fleksibilnost, improvizacija, neformalni procesi."},
-      "C2": {"name": "Competitive Achievement", "high":"Performance-Driven – takmičenje, ambicija, lične pobede.","low":"Empathetic – harmonija, konsenzus, odnosi."},
-      "C3": {"name": "Collective Loyalty", "high":"Team-First – lojalnost, zajedništvo, deljena zasluga.","low":"Individualist – autonomija, lični ciljevi."},
-      "C4": {"name": "Commitment to Growth", "high":"Growth-Oriented – planiranje, istrajnost, dugoročno.","low":"Present-Oriented – kratkoročni fokus i fleksibilnost."}
-    };
-
-    /* ----- NORME (skraćene iz tvojih fajlova – interpolacija između ključeva) ----- */
-    const NORMS = {
-      "C1":{"10":6.5207,"11":15.1370,"12":22.7792,"13":28.0885,"14":32.4205,"15":37.2849,"16":42.9542,"17":47.9027,"18":52.6201,"19":57.9489,"20":63.5862,"21":69.6387,"22":75.4255,"23":81.4768,"24":88.1996,"25":100.0},
-      "C2":{"7":8.0007,"8":15.2889,"9":21.3368,"10":26.0754,"11":30.2904,"12":34.8356,"13":40.0439,"14":44.6915,"15":48.5861,"16":52.5775,"17":56.4825,"18":60.0625,"19":63.8919,"20":67.5953,"21":71.4286,"22":76.1905,"23":80.9524,"24":85.7143,"25":90.4762,"26":95.2381,"27":100.0},
-      "C3":{"7":5.7145,"8":14.5265,"9":20.8596,"10":25.0023,"11":27.8356,"12":30.9492,"13":33.8431,"14":36.5778,"15":40.1901,"16":44.0757,"17":48.1195,"18":52.7564,"19":56.5603,"20":59.1004,"21":62.3040,"22":66.2910,"23":69.6621,"24":73.0441,"25":76.2684,"26":79.5074,"27":83.3599,"28":87.1384,"29":91.8525,"30":100.0},
-      "C4":{"12":8.6921,"13":17.1128,"14":24.2003,"15":30.3047,"16":36.3827,"17":42.5514,"18":48.8600,"19":55.2702,"20":61.7834,"21":68.3770,"22":74.8005,"23":81.3404,"24":88.7214,"25":100.0}
-    };
-
-    /* ----- FIGURES iz tvog Excel-a (8 ličnosti) ----- */
-<script>
-let FIGURES = [];
-
-fetch("figures.json")
-  .then(r => r.json())
-  .then(data => {
-    FIGURES = data;
-    console.log("Učitane ličnosti:", FIGURES);
-  });
-</script>
-
-    /* ----- RENDER PITANJA ----- */
-    const qWrap = document.getElementById('questions');
-    (function renderQuestions(){
-      qWrap.innerHTML = '';
-      ITEMS.forEach(q => {
-        const div = document.createElement('div');
-        div.className = 'q';
-        div.innerHTML = `
-          <h3>${q.id}. ${q.text}</h3>
-          <div class="scale">
-            ${[1,2,3,4,5].map(v => `
-              <label><input type="radio" name="q_${q.id}" value="${v}" required /> ${v}</label>`
-            ).join('')}
-          </div>
-          <div class="small muted">Skala: 1 = nimalo • 5 = u potpunosti</div>
-        `;
-        qWrap.appendChild(div);
-      });
-    })();
-
-    /* ----- POMOĆNE FUNKCIJE ----- */
-    function computeRawScores(form){
-      const sums = {};
-      ITEMS.forEach(q => { sums[q.dim] = (sums[q.dim]||0) + Number(form.get(`q_${q.id}`)||0); });
-      return sums;
-    }
-    function normLookup(dim, raw){
-      const table = NORMS[dim];
-      if(!table) return 0;
-      if(table[String(raw)]!==undefined) return table[String(raw)];
-      const keys = Object.keys(table).map(Number).sort((a,b)=>a-b);
-      if(raw<=keys[0]) return table[keys[0]];
-      if(raw>=keys[keys.length-1]) return table[keys[keys.length-1]];
-      let i=0; while(i<keys.length && keys[i]<raw) i++;
-      const k1 = keys[i-1], k2 = keys[i];
-      const v1 = table[k1],  v2 = table[k2];
-      const t = (raw-k1)/(k2-k1);
-      return v1 + t*(v2-v1);
-    }
-    // Koenova mera (Pearson korelacija)
-    function profileSimilarity(user, fig){
-      const dims = ['C1','C2','C3','C4'];
-      const x = dims.map(d => user[d] || 0);
-      const y = dims.map(d => fig[d] || 0);
-      const meanX = x.reduce((a,b)=>a+b,0)/x.length;
-      const meanY = y.reduce((a,b)=>a+b,0)/y.length;
-      let num=0, denX=0, denY=0;
-      for(let i=0;i<dims.length;i++){
-        const dx=x[i]-meanX, dy=y[i]-meanY;
-        num+=dx*dy; denX+=dx*dx; denY+=dy*dy;
-      }
-      if(denX===0 || denY===0) return 0;
-      return num/Math.sqrt(denX*denY);
-    }
-
-    /* ----- CRTANJE KOMPASA ----- */
-    function drawCompass(user, figure){
-      const canvas = document.getElementById('compassCanvas');
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-
-      const size = canvas.width;
-      const radius = size * 0.36;
-      const centerX = size/2, centerY = size/2;
-      const dims = ['C1','C2','C3','C4'];
-      const angles = [ -Math.PI/2, 0, Math.PI/2, Math.PI ];
-
-      // Osi i natpisi
-      ctx.strokeStyle = '#666';
-      dims.forEach((d,i)=>{
-        const x = centerX + radius*Math.cos(angles[i]);
-        const y = centerY + radius*Math.sin(angles[i]);
-        ctx.beginPath(); ctx.moveTo(centerX,centerY); ctx.lineTo(x,y); ctx.stroke();
-        ctx.fillStyle='#333'; ctx.font='12px sans-serif'; ctx.textAlign='center';
-        const label = (DIMS_INFO[d] && DIMS_INFO[d].name) ? DIMS_INFO[d].name : d;
-        ctx.fillText(label, x, y+(i===0?-10:i===2?20:0));
-      });
-
-      function drawPoly(obj,color){
-        ctx.beginPath();
-        dims.forEach((dim,i)=>{
-          const val = obj[dim]||0;
-          const r=(val/100)*radius;
-          const x=centerX+r*Math.cos(angles[i]);
-          const y=centerY+r*Math.sin(angles[i]);
-          if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-        });
-        ctx.closePath();
-        ctx.fillStyle=color.replace('1)', '0.3)'); ctx.fill();
-        ctx.strokeStyle=color; ctx.lineWidth=2; ctx.stroke();
-      }
-
-      drawPoly(user,'rgba(56,176,0,1)');     // tvoj profil (zelena)
-      drawPoly(figure,'rgba(255,110,110,1)'); // izabrana ličnost (crvena)
-    }
-
-    /* ----- SUBMIT LOGIKA ----- */
-    const form = document.getElementById('quiz');
-    const legendDiv = document.getElementById('legend');
-    const detailsDiv = document.getElementById('details');
-
-    form.addEventListener('submit', (e)=>{
-      e.preventDefault();
-      const data = new FormData(form);
-      const raw = computeRawScores(data);
-      const dims = ['C1','C2','C3','C4'];
-      const normed = {};
-      dims.forEach(d=> normed[d] = Number(normLookup(d, raw[d]||0).toFixed(2)) );
-
-      // Koenova mera: najsličniji (max r) i najrazličitiji (min r)
-      let best = null, worst = null, bestR = -Infinity, worstR = Infinity;
-      FIGURES.forEach(f => {
-        const r = profileSimilarity(normed, f.profile);
-        if(r > bestR){ bestR = r; best = f; }
-        if(r < worstR){ worstR = r; worst = f; }
-      });
-
-      drawCompass(normed, best.profile);
-      legendDiv.innerHTML = '<span style="color:#38B000">■ Tvoj profil</span><span style="color:#ff6e6e">■ ' + best.name + '</span>';
-
-      // Opisi dimenzija + rezultati
-      detailsDiv.innerHTML = "";
-      dims.forEach(d => {
-        const div = document.createElement('div');
-        div.className = 'dim-desc';
-        const dimName = (DIMS_INFO[d] && DIMS_INFO[d].name) ? DIMS_INFO[d].name : d;
-        const hi = DIMS_INFO[d]?.high || '';
-        const lo = DIMS_INFO[d]?.low || '';
-        div.innerHTML = `<strong>${d} - ${dimName}</strong>: ${normed[d]}
-          <div><em>Visok skor:</em> ${hi}</div>
-          <div><em>Nizak skor:</em> ${lo}</div>`;
-        detailsDiv.appendChild(div);
-      });
-
-      // Kartice sa najsličnijom i najrazličitijom ličnošću
-      detailsDiv.innerHTML += `
-        <div class="best-card">
-          <h2>Najsličniji si: ${best.name}</h2>
-          ${best.description ? `<p>${best.description}</p>` : ``}
-          <p>Sličnost (r): ${bestR.toFixed(2)}</p>
-          ${best.wiki ? `<p><a href="${best.wiki}" target="_blank" rel="noopener">Pročitaj više na Wikipediji →</a></p>` : ``}
-        </div>
-        <div class="best-card">
-          <h2>Najrazličitiji si od: ${worst.name}</h2>
-          ${worst.description ? `<p>${worst.description}</p>` : ``}
-          <p>Sličnost (r): ${worstR.toFixed(2)}</p>
-          ${worst.wiki ? `<p><a href="${worst.wiki}" target="_blank" rel="noopener">Pročitaj više na Wikipediji →</a></p>` : ``}
-        </div>
-      `;
-
-      window.scrollTo({top:0,behavior:'smooth'});
+    // Učitaj stavke i ličnosti
+    Promise.all([
+      fetch("items.json").then(r => r.json()),
+      fetch("figures.json").then(r => r.json())
+    ]).then(([items, figures]) => {
+      ITEMS = items;
+      FIGURES = figures;
+      renderQuestions();
     });
 
-    document.getElementById('resetBtn').addEventListener('click', ()=>{
+    // Kreiranje pitanja
+    const qWrap = document.getElementById("questions");
+    function renderQuestions(){
+      qWrap.innerHTML="";
+      ITEMS.forEach(q=>{
+        const div=document.createElement("div");
+        div.className="q";
+        div.innerHTML=`
+          <h3>${q.id}. ${q.text}</h3>
+          <div class="scale">
+            ${[1,2,3,4,5].map(v=>`
+              <label>
+                <input type="radio" name="q_${q.id}" value="${v}" required /> ${v}
+              </label>`).join("")}
+          </div>`;
+        qWrap.appendChild(div);
+      });
+    }
+
+    // Izračunavanje skorova
+    function computeScores(form){
+      const sums={C1:0,C2:0,C3:0,C4:0};
+      ITEMS.forEach(q=>{
+        sums[q.dim] += Number(form.get(`q_${q.id}`)||0);
+      });
+      return sums;
+    }
+
+    // Koenova mera sličnosti
+    function cohensCorrelation(user, fig){
+      const dims=["C1","C2","C3","C4"];
+      const u = dims.map(d=>user[d]);
+      const f = dims.map(d=>fig[d]);
+      const uMean = u.reduce((a,b)=>a+b,0)/u.length;
+      const fMean = f.reduce((a,b)=>a+b,0)/f.length;
+      const num = u.map((val,i)=>(val-uMean)*(f[i]-fMean)).reduce((a,b)=>a+b,0);
+      const den1 = Math.sqrt(u.map(v=>(v-uMean)**2).reduce((a,b)=>a+b,0));
+      const den2 = Math.sqrt(f.map(v=>(v-fMean)**2).reduce((a,b)=>a+b,0));
+      return num/(den1*den2);
+    }
+
+    // Crtanje na kompasu
+    function drawCompass(user, figure){
+      const canvas=document.getElementById("compassCanvas");
+      const ctx=canvas.getContext("2d");
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      const bg = new Image();
+      bg.src="compass.svg";
+      bg.onload=()=>{
+        ctx.drawImage(bg,0,0,canvas.width,canvas.height);
+
+        const dims=["C1","C2","C3","C4"];
+        const angles={C1:-Math.PI/2,C2:0,C3:Math.PI/2,C4:Math.PI};
+        const radius=200, cx=250, cy=250;
+
+        function drawPoly(profile,color){
+          ctx.beginPath();
+          dims.forEach((d,i)=>{
+            const val=profile[d]||0;
+            const r=(val/100)*radius;
+            const x=cx+r*Math.cos(angles[d]);
+            const y=cy+r*Math.sin(angles[d]);
+            if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+          });
+          ctx.closePath();
+          ctx.strokeStyle=color;
+          ctx.lineWidth=2;
+          ctx.stroke();
+          ctx.fillStyle=color.replace("1)","0.3)");
+          ctx.fill();
+        }
+
+        drawPoly(user,"rgba(56,176,0,1)");
+        drawPoly(figure,"rgba(255,110,110,1)");
+      };
+    }
+
+    // Rukovanje formom
+    const form=document.getElementById("quiz");
+    form.addEventListener("submit",e=>{
+      e.preventDefault();
+      const data=new FormData(form);
+      const scores=computeScores(data);
+
+      let best=null, bestSim=-2;
+      FIGURES.forEach(f=>{
+        const sim=cohensCorrelation(scores,f.profile);
+        if(sim>bestSim){bestSim=sim;best=f;}
+      });
+
+      drawCompass(scores,best.profile);
+      document.getElementById("legend").innerHTML=
+        `<span style="color:#38B000">■ Tvoj profil</span>
+         <span style="color:#ff6e6e">■ ${best.name} (sličnost=${bestSim.toFixed(2)})</span>`;
+    });
+
+    document.getElementById("resetBtn").addEventListener("click",()=>{
       form.reset();
-      const ctx = document.getElementById('compassCanvas').getContext('2d');
-      ctx.clearRect(0,0,400,400);
-      legendDiv.innerHTML = "";
-      detailsDiv.innerHTML = '<p class="muted small">Nakon slanja testa, ovde će biti prikazan kompas dijagram, tvoji skorovi i najsličnija/najrazličitija istorijska ličnost.</p>';
-      window.scrollTo({top:0,behavior:'smooth'});
+      const ctx=document.getElementById("compassCanvas").getContext("2d");
+      ctx.clearRect(0,0,500,500);
+      document.getElementById("legend").innerHTML="";
     });
   </script>
 </body>
