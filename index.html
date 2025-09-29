@@ -119,16 +119,16 @@
     };
 
     /* ----- FIGURES iz tvog Excel-a (8 ličnosti) ----- */
-    const FIGURES = [
-      {"name":"Queen Victoria","description":"Kraljica Engleske","wiki":"https://sh.wikipedia.org/wiki/Viktorija","profile":{"C1":70.0,"C2":50.0,"C3":50.0,"C4":50.0}},
-      {"name":"Napoleon","description":"Francuski imperator","wiki":"https://sh.wikipedia.org/wiki/Napoleon_I_Bonaparte","profile":{"C1":50.0,"C2":70.0,"C3":50.0,"C4":50.0}},
-      {"name":"Marie Therese","description":"Austrijska carica","wiki":"https://sh.wikipedia.org/wiki/Maria_Theresia","profile":{"C1":50.0,"C2":50.0,"C3":70.0,"C4":50.0}},
-      {"name":"Franklin Roosevelt","description":"Američki predsednik","wiki":"https://sh.wikipedia.org/wiki/Franklin_Delano_Roosevelt","profile":{"C1":50.0,"C2":50.0,"C3":50.0,"C4":70.0}},
-      {"name":"Winston Churchill","description":"Premijer Velike Britanije","wiki":"https://sh.wikipedia.org/wiki/Winston_Churchill","profile":{"C1":20.0,"C2":50.0,"C3":50.0,"C4":50.0}},
-      {"name":"Pericles","description":"Atinski državnik","wiki":"https://sh.wikipedia.org/wiki/Perikle","profile":{"C1":50.0,"C2":20.0,"C3":50.0,"C4":50.0}},
-      {"name":"John Kennedy","description":"Američki predsednik","wiki":"https://sh.wikipedia.org/wiki/John_F._Kennedy","profile":{"C1":50.0,"C2":50.0,"C3":20.0,"C4":50.0}},
-      {"name":"James 2","description":"Kralj Engleske i Škotske","wiki":"https://sh.wikipedia.org/wiki/James_II_od_Engleske","profile":{"C1":50.0,"C2":50.0,"C3":50.0,"C4":20.0}}
-    ];
+    <script>
+let FIGURES = [];
+
+fetch("figures.json")
+  .then(r => r.json())
+  .then(data => {
+    FIGURES = data;
+    console.log("Učitane ličnosti:", FIGURES);
+  });
+</script>
 
     /* ----- RENDER PITANJA ----- */
     const qWrap = document.getElementById('questions');
