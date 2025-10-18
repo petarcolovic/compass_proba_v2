@@ -87,4 +87,16 @@
       "C4": 20.0
     }
   }
+
+  {
+    "name": "Elon Musk",
+    "description": "Corporate Leader, Digital / Tech Era (2010s–2020s)",
+    "wiki": "https://en.wikipedia.org/wiki/Elon_Musk",
+    "profile": {
+      "C1": 20.0,
+      "C2": 70.0,
+      "C3": 35.0,
+      "C4": 55.0
+    }
+  }
 ]
