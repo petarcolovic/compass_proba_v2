@@ -1,112 +1,112 @@
 [
   {
     "id": 1,
-    "text": "Potrebna su mi precizna uputstva kako bih tačno znao šta se od mene očekuje                                         ",
+    "text": "I need precise instructions to know what is expected of me                                         ",
     "dim": "C1"
   },
   {
     "id": 2,
-    "text": "Pojedinac treba da stavi interes grupe ispred svog                                                                  ",
+    "text": "An individual should prioritize group's interest to her/his own                                                                  ",
     "dim": "C3"
   },
   {
     "id": 3,
-    "text": "Smatram da je pažljivo upravljanje novcem veoma važno                                                               ",
+    "text": "I think that handling money carefully is of utmost importance                                                               ",
     "dim": "C4"
   },
   {
     "id": 4,
-    "text": "Moj primarni cilj u donošenju odluka je da postignem najbolje rezultate  čak i ako to znači da zasenim ideje drugih ",
+    "text": "My primary goal in decision making is to achieve the best results, regardless of whether I will outshine others by that",
     "dim": "C2"
   },
   {
     "id": 5,
-    "text": "Nije poželjno da rukovodioci često traže mišljenje zaposlenih na nižim pozicijama                                   ",
+    "text": "It is not desirable for managers to often consult lower-ranked employees                                   ",
     "dim": "C2"
   },
   {
     "id": 6,
-    "text": "Pridržavanje pravila i procedura je ključno za dobar rad                                                            ",
+    "text": "Following rules and procedures is crucial for good work                                                            ",
     "dim": "C1"
   },
   {
     "id": 7,
-    "text": "Čak i u teškim vremenima  ljudi bi trebalo da ostanu lojalni svojoj grupi                                           ",
+    "text": "Even in difficult times, people should remain loyal to their group                                           ",
     "dim": "C3"
   },
   {
     "id": 8,
-    "text": "Za mene je važno da istrajem i kada se suočavam sa otporom                                                          ",
+    "text": "For me, it is greatly important to persist even when I am facing resistance                                                          ",
     "dim": "C4"
   },
   {
     "id": 9,
-    "text": "Kako se ljudi osjećaju u procesu donošenja odluka nije važan faktor                                                 ",
+    "text": "In the decision making process, people's feelings are not an important factor                                                 ",
     "dim": "C2"
   },
   {
     "id": 10,
-    "text": "Pravila i propisi mi pomažu da znam šta se od mene očekuje                                                          ",
+    "text": "Rules and regulations help me greatly to know what is expected of me                                                          ",
     "dim": "C1"
   },
   {
     "id": 11,
-    "text": "Važnije je da grupa napreduje nego da se ističu pojedinci                                                           ",
+    "text": "Group's progress is more important than individuals' standing out                                                           ",
     "dim": "C3"
   },
   {
     "id": 12,
-    "text": "Nije mi bitan uticaj odluka na osjećanja i odnose ljudi                                                             ",
+    "text": "The effect of decisions on people's feelings and relationships does not matter to me.                                                             ",
     "dim": "C2"
   },
   {
     "id": 13,
-    "text": "Standardizovane procedure olakšavaju obavljanje posla                                                               ",
+    "text": "Standardized procedures make work easier                                                               ",
     "dim": "C1"
   },
   {
     "id": 14,
-    "text": "Bolje je kada uspije tim nego pojedinac                                                                             ",
+    "text": "Team success is much more preferable than individual's success                                                                             ",
     "dim": "C3"
   },
   {
     "id": 15,
-    "text": "Dugoročno planiranje mi je izuzetno značajno                                                                        ",
+    "text": "Long-term planning is of utmost importance to me                                                                        ",
     "dim": "C4"
   },
   {
     "id": 16,
-    "text": "Zadovoljniji sam kada moje odluke dovedu do boljih rezultata od rezultata mojih kolega                              ",
+    "text": "I'm extra satisfied when my decisions yield better results than the results my colleagues achieved.                               ",
     "dim": "C2"
   },
   {
     "id": 17,
-    "text": "Važne zadatke ne bi trebalo delegirati zaposlenima na nižim pozicijama                                              ",
+    "text": "Important tasks and commitments should not be delegated to lower-ranked employees                                              ",
     "dim": "C2"
   },
   {
     "id": 18,
-    "text": "Jasne procedure su ključne za uspješnu realizaciju zadataka                                                         ",
+    "text": "Clear procedures are crucial in successfull accomplishment of the task                                                         ",
     "dim": "C1"
   },
   {
     "id": 19,
-    "text": "Prije nego što se posveti svojim ciljevima  pojedinac bi trebalo da razmisli o tome kako oni utiču na grupu         ",
+    "text": "Before one commits to one's own goals, she/he should consider how they would affect the group         ",
     "dim": "C3"
   },
   {
     "id": 20,
-    "text": "Spreman sam da se odreknem zabave danas zarad budućeg uspjeha                                                       ",
+    "text": "I am ready to give up fun today for the sake of future success                                                       ",
     "dim": "C4"
   },
   {
     "id": 21,
-    "text": "Lojalnost prema grupi treba podsticati  čak i kada se kosi s ličnim ciljevima                                       ",
+    "text": "Loyalty to the group should be encouraged even when it collides with personal goals                                       ",
     "dim": "C3"
   },
   {
     "id": 22,
-    "text": "Naporan rad zarad uspjeha u budućnosti  za mene je važan                                                            ",
+    "text": "Hard work for future success is greatly important to me.                                                           ",
     "dim": "C4"
   }
 ]
