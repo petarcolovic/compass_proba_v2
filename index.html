@@ -242,7 +242,7 @@
 
       drawCompass(normed,best.profile);
 
-      legendDiv.innerHTML='<span style="color:#38B000">■ Tvoj profil</span><span style="color:#ff6e6e">■ '+best.name+'</span>';
+      legendDiv.innerHTML='<span style="color:#38B000">■ Your profile</span><span style="color:#ff6e6e">■ '+best.name+'</span>';
 
       summaryDiv.innerHTML=`
         <h2>You are most similar to: ${best.name}</h2>
@@ -257,8 +257,8 @@
       detailsDiv.innerHTML="";
       dims.forEach(d=>{
         detailsDiv.innerHTML+=`<div class="dim-desc"><strong>${d} - ${DIMS_INFO[d].name}</strong>: ${normed[d]}
-          <div><em>Visok skor:</em> ${DIMS_INFO[d].high}</div>
-          <div><em>Nizak skor:</em> ${DIMS_INFO[d].low}</div>
+          <div><em>High score:</em> ${DIMS_INFO[d].high}</div>
+          <div><em>Low score:</em> ${DIMS_INFO[d].low}</div>
         </div>`;
       });
 
