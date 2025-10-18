@@ -1,8 +1,8 @@
 [
   {
     "name": "Queen Victoria",
-    "description": "Kraljica Engleske",
-    "wiki": "https://sh.wikipedia.org/wiki/Viktorija",
+    "description": "Queen of England",
+    "wiki": "https://en.wikipedia.org/wiki/Queen_Victoria",
     "profile": {
       "C1": 70.0,
       "C2": 50.0,
@@ -11,9 +11,9 @@
     }
   },
   {
-    "name": "Napoleon",
-    "description": "Francuski imperator",
-    "wiki": "https://sh.wikipedia.org/wiki/Napoleon_I_Bonaparte",
+    "name": "Napoleon Bonaparte",
+    "description": "French emperor",
+    "wiki": "https://en.wikipedia.org/wiki/Napoleon",
     "profile": {
       "C1": 50.0,
       "C2": 70.0,
@@ -22,9 +22,9 @@
     }
   },
   {
-    "name": "Marie Therese",
-    "description": "Austrijska carica",
-    "wiki": "https://sh.wikipedia.org/wiki/Maria_Theresia",
+    "name": "Maria Theresa",
+    "description": "Empress of Austria",
+    "wiki": "https://en.wikipedia.org/wiki/Maria_Theresa",
     "profile": {
       "C1": 50.0,
       "C2": 50.0,
@@ -33,9 +33,9 @@
     }
   },
   {
-    "name": "Franklin Roosevelt",
-    "description": "Američki predsednik",
-    "wiki": "https://sh.wikipedia.org/wiki/Franklin_Delano_Roosevelt",
+    "name": "Franklin D. Roosevelt",
+    "description": "President of the USA",
+    "wiki": "https://en.wikipedia.org/wiki/Franklin_D._Roosevelt",
     "profile": {
       "C1": 50.0,
       "C2": 50.0,
@@ -45,8 +45,8 @@
   },
   {
     "name": "Winston Churchill",
-    "description": "Premijer Velike Britanije",
-    "wiki": "https://sh.wikipedia.org/wiki/Winston_Churchill",
+    "description": "Prime minister of the United Kingdom",
+    "wiki": "https://en.wikipedia.org/wiki/Winston_Churchill",
     "profile": {
       "C1": 20.0,
       "C2": 50.0,
@@ -56,8 +56,8 @@
   },
   {
     "name": "Pericles",
-    "description": "Atinski državnik",
-    "wiki": "https://sh.wikipedia.org/wiki/Perikle",
+    "description": "Statesman of Athens",
+    "wiki": "https://en.wikipedia.org/wiki/Pericles",
     "profile": {
       "C1": 50.0,
       "C2": 20.0,
@@ -67,8 +67,8 @@
   },
   {
     "name": "John Kennedy",
-    "description": "Američki predsednik",
-    "wiki": "https://sh.wikipedia.org/wiki/John_F._Kennedy",
+    "description": "President of the USA",
+    "wiki": "https://en.wikipedia.org/wiki/John_F._Kennedy",
     "profile": {
       "C1": 50.0,
       "C2": 50.0,
@@ -78,8 +78,8 @@
   },
   {
     "name": "James 2",
-    "description": "Kralj Engleske i Škotske",
-    "wiki": "https://sh.wikipedia.org/wiki/James_II_od_Engleske",
+    "description": "King of England and Scotland",
+    "wiki": "https://en.wikipedia.org/wiki/James_II_of_England",
     "profile": {
       "C1": 50.0,
       "C2": 50.0,
