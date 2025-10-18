@@ -245,13 +245,13 @@
       legendDiv.innerHTML='<span style="color:#38B000">■ Tvoj profil</span><span style="color:#ff6e6e">■ '+best.name+'</span>';
 
       summaryDiv.innerHTML=`
-        <h2>Najsličniji si: ${best.name}</h2>
+        <h2>You are most similar to: ${best.name}</h2>
         <p>${best.description}</p>
-        <p><strong>Sličnost (Koen):</strong> ${bestSim.toFixed(2)}</p>
+        <p><strong>Similarity (Cohen):</strong> ${bestSim.toFixed(2)}</p>
         ${best.wiki?`<p><a href="${best.wiki}" target="_blank">Pročitaj više →</a></p>`:""}
-        <h3>Najmanje sličan si: ${worst.name}</h3>
+        <h3>You are least similar to: ${worst.name}</h3>
         <p>${worst.description}</p>
-        <p><strong>Sličnost (Koen):</strong> ${worstSim.toFixed(2)}</p>
+        <p><strong>Similarity (Cohen):</strong> ${worstSim.toFixed(2)}</p>
       `;
 
       detailsDiv.innerHTML="";
