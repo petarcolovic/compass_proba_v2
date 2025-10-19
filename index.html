@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="sr">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Compass</title>
+  <title>The 4C Culture Compass™ by Recrewty</title>
   <style>
     /* ===== section: global layout ===== */
     body {
-      font-family: Arial, Helvetica, sans-serif;
-      background-color: #0e0e0e;
-      color: #ffffff;
+      font-family: "Helvetica Neue", Arial, sans-serif;
+      background-color: #ffffff;
+      color: #000000;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -24,6 +24,7 @@
       flex-direction: column;
       align-items: center;
       margin-bottom: 40px;
+      text-align: center;
     }
 
     header img {
@@ -34,8 +35,9 @@
 
     h1 {
       margin: 0;
-      font-size: 2em;
+      font-size: 1.8em;
       text-align: center;
+      font-weight: 600;
     }
 
     /* ===== section: compass ===== */
@@ -62,15 +64,25 @@
     }
 
     .figure-card {
-      background: #1a1a1a;
+      background: #f7f7f7;
       border-radius: 10px;
       padding: 20px;
-      box-shadow: 0 0 10px rgba(255,255,255,0.1);
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+      transition: transform 0.2s ease;
+    }
+
+    .figure-card:hover {
+      transform: translateY(-4px);
     }
 
     .figure-card h3 {
       margin-top: 0;
-      color: #ffd700;
+      color: #003366;
+    }
+
+    .figure-card ul {
+      padding-left: 20px;
+      margin: 0;
     }
 
     /* ===== section: footer ===== */
@@ -78,7 +90,7 @@
       text-align: center;
       margin-top: auto;
       font-size: 0.9em;
-      color: #aaa;
+      color: #555;
       padding: 20px 0;
     }
   </style>
@@ -87,8 +99,8 @@
 <body>
   <!-- section: header -->
   <header>
-    <img src="./recrewty-logo-white.png" alt="Logo" />
-    <h1>Kompas ličnosti</h1>
+    <img src="./recrewty-logo-white.png" alt="Recrewty Logo" />
+    <h1>The 4C Culture Compass™ by Recrewty</h1>
   </header>
 
   <!-- section: compass -->
@@ -103,7 +115,7 @@
 
   <!-- section: footer -->
   <footer>
-    <p>&copy; 2025 Kompas ličnosti | Sva prava zadržana</p>
+    <p>&copy; 2025 Recrewty | The 4C Culture Compass™</p>
   </footer>
 
   <!-- section: scripts -->
@@ -131,8 +143,8 @@
 
           card.innerHTML = `
             <h3>${figure.name}</h3>
-            <p><strong>Opis:</strong> ${figure.description || "Nema podataka."}</p>
-            <p><strong>Osobine:</strong></p>
+            <p><strong>Description:</strong> ${figure.description || "No data available."}</p>
+            <p><strong>Traits:</strong></p>
             <ul>
               ${(figure.traits || [])
                 .map(trait => `<li>${trait}</li>`)
@@ -144,8 +156,8 @@
         });
       } catch (error) {
         const container = document.getElementById("figures");
-        container.innerHTML = "<p>Podaci trenutno nisu dostupni.</p>";
-        console.error("Greška pri učitavanju podataka:", error);
+        container.innerHTML = "<p>Data currently unavailable.</p>";
+        console.error("Data loading error:", error);
       }
     }
 
