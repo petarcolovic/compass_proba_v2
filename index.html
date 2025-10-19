@@ -4,6 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The 4C Culture Compass™ by Recrewty</title>
+
+  <!-- EmailJS -->
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    (function(){
+      emailjs.init("buMM4aYEM_n4bPDZI");
+    })();
+  </script>
+
   <style>
     :root{
       --bg:#ffffff;
@@ -64,8 +73,15 @@
     .compass-bg{position:relative;display:inline-block}
     .compass-bg img{width:400px;height:400px;display:block}
     .compass-bg canvas{position:absolute;left:0;top:0}
+    .label{
+      position:absolute;font-size:13px;font-weight:600;color:#444;
+      background:rgba(255,255,255,0.8);padding:2px 6px;border-radius:6px;
+      transform:translate(-50%,-50%);
+    }
+    #statusMsg{padding:10px 20px;font-size:14px;color:var(--accent);}
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <header>
@@ -79,21 +95,34 @@
       <!-- Leva strana: pitanja -->
       <form id="quiz" class="card">
         <div class="intro">
-          <p class="muted">Responses for each statement from 1 (do not agree at all) to 5 (completely agree).</p>
+          <p class="muted">
+            Odgovori za svaku tvrdnju od 1 (uopšte se ne slažem) do 5 (u potpunosti se slažem).<br>
+            (Unos e-mail adrese je <strong>opcion</strong> — samo ako želiš da nam pošalješ rezultate za detaljniji izveštaj.)
+          </p>
+          <label><strong>Tvoj e-mail (opciono):</strong></label>
+          <input type="email" id="userEmail" name="userEmail" placeholder="primer@domena.com"
+                 style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:1px solid #ccc;">
         </div>
         <div id="questions"></div>
+        <div id="statusMsg"></div>
         <div class="actions">
-          <button type="submit">Submit</button>
-          <button type="button" id="resetBtn" class="muted" style="background:transparent;color:var(--text);border:1px solid rgba(0,0,0,.12)">Erase</button>
+          <button type="submit">Pošalji</button>
+          <button type="button" id="resetBtn" class="muted"
+                  style="background:transparent;color:var(--text);border:1px solid rgba(0,0,0,.12)">Poništi</button>
         </div>
       </form>
 
       <!-- Desna strana: rezultati -->
       <section id="output" class="card" aria-live="polite">
         <div class="result">
-          <div class="compass-bg">
+          <div class="compass-bg" style="position:relative;">
             <img src="compass.svg" alt="Compass background"/>
             <canvas id="compassCanvas" width="400" height="400"></canvas>
+            <!-- Etikete oko kompasa -->
+            <div class="label" style="top:10px;left:50%;">C1</div>
+            <div class="label" style="top:50%;left:95%;">C2</div>
+            <div class="label" style="bottom:10px;left:50%;">C3</div>
+            <div class="label" style="top:50%;left:5%;">C4</div>
           </div>
           <div id="legend"></div>
         </div>
@@ -107,7 +136,6 @@
     let ITEMS = [];
     let FIGURES = [];
 
-    // Učitaj pitanja i ličnosti iz JSON fajlova
     async function loadData(){
       const itemsRes = await fetch("items.json");
       ITEMS = await itemsRes.json();
@@ -116,23 +144,10 @@
       renderQuestions();
     }
 
-    const DIMS_INFO = {
-      "C1": {"name":"Clarity & Compliance vs Agility","high":"Structured Culture - Emphasizes rules, consistency, SOPs. Predictable, process-driven, ideal for scaling operations.","low":"Agile Culture - Values flexibility, improvisation, and informal processes. Good for startups, creative teams, or fast pivots."},
-      "C2": {"name":"Competitive Achievement","high":"Performance-Driven Culture - Values competition, ambition, and personal wins. Ideal for sales, finance, high-stakes roles.","low":"Empathetic Culture - Focused on emotional intelligence, harmony, and consensus. Ideal for care-based sectors or internal-facing roles."},
-      "C3": {"name":"Collective Loyalty","high":"Team-First Culture - Prioritizes group harmony, shared credit, and loyalty. Strong cohesion and retention.","low":"Individualist Culture - Encourages autonomy, self-expression, and personal goals. Energizing but can reduce cohesion."},
-      "C4": {"name":"Commitment to Growth","high":"Growth-Oriented Culture - Values planning, long-term thinking, perseverance, and saving resources for the future.","low":"Present-Oriented Culture - Optimized for short-term gains, flexibility, and immediate feedback loops. Can be highly reactive."}
-    };
+    const DIMS = ["C1","C2","C3","C4"];
 
-    // Norme (skraćeni primeri, dodaj sve koje već koristiš)
-    const NORMS = {
-      "C1": {"10":6.5,"11":15.1,"12":22.7,"13":28.0,"14":32.4,"15":37.2,"16":42.9,"17":47.9,"18":52.6,"19":57.9,"20":63.5,"21":69.6,"22":75.4,"23":81.4,"24":88.1,"25":100.0},
-      "C2": {"7":8.0,"8":15.2,"9":21.3,"10":26.0,"11":30.2,"12":34.8,"13":40.0,"14":44.6,"15":48.5,"16":52.5,"17":56.4,"18":60.0,"19":63.8,"20":67.5,"21":71.4,"22":76.1,"23":80.9,"24":85.7,"25":90.4,"26":95.2,"27":100.0},
-      "C3": {"7":5.7,"8":14.5,"9":20.8,"10":25.0,"11":27.8,"12":30.9,"13":33.8,"14":36.5,"15":40.1,"16":44.0,"17":48.1,"18":52.7,"19":56.5,"20":59.1,"21":62.3,"22":66.2,"23":69.6,"24":73.0,"25":76.2,"26":79.5,"27":83.3,"28":87.1,"29":91.8,"30":100.0},
-      "C4": {"12":8.6,"13":17.1,"14":24.2,"15":30.3,"16":36.3,"17":42.5,"18":48.8,"19":55.2,"20":61.7,"21":68.3,"22":74.8,"23":81.3,"24":88.7,"25":100.0}
-    };
-
-    const qWrap = document.getElementById('questions');
     function renderQuestions(){
+      const qWrap = document.getElementById('questions');
       qWrap.innerHTML = '';
       ITEMS.forEach(q=>{
         const div=document.createElement('div');
@@ -145,7 +160,7 @@
                 <input type="radio" name="q_${q.id}" value="${v}" required /> ${v}
               </label>`).join('')}
           </div>
-          <div class="small muted">Scale: 1 = not at all • 5 = completely</div>`;
+          <div class="small muted">Skala: 1 = nimalo • 5 = u potpunosti</div>`;
         qWrap.appendChild(div);
       });
     }
@@ -156,31 +171,13 @@
       return sums;
     }
 
-    function normLookup(dim, raw){
-      const table=NORMS[dim];
-      if(!table) return 0;
-      let exact=table[String(raw)];
-      if(exact!==undefined) return exact;
-      const keys=Object.keys(table).map(k=>Number(k)).sort((a,b)=>a-b);
-      if(keys.length===0) return 0;
-      if(raw<=keys[0]) return table[String(keys[0])];
-      if(raw>=keys[keys.length-1]) return table[String(keys[keys.length-1])];
-      let i=0; while(i<keys.length && keys[i]<raw) i++;
-      const k2=keys[i],k1=keys[i-1];
-      const v1=table[String(k1)],v2=table[String(k2)];
-      const t=(raw-k1)/(k2-k1);
-      return v1+t*(v2-v1);
-    }
-
-    // Koenova mera (Pearson korelacija)
     function profileSimilarity(user, fig){
-      const dims=["C1","C2","C3","C4"];
-      const u=dims.map(d=>user[d]||0);
-      const f=dims.map(d=>fig[d]||0);
+      const u=DIMS.map(d=>user[d]||0);
+      const f=DIMS.map(d=>fig[d]||0);
       const meanU=u.reduce((a,b)=>a+b,0)/u.length;
-      const meanF=f.reduce((a,b)=>a+b,0)/f.length;
+      const meanF=f.reduce((a,b)=>a+b,0)/u.length;
       let num=0,denU=0,denF=0;
-      for(let i=0;i<dims.length;i++){
+      for(let i=0;i<DIMS.length;i++){
         num+=(u[i]-meanU)*(f[i]-meanF);
         denU+=(u[i]-meanU)**2;
         denF+=(f[i]-meanF)**2;
@@ -188,91 +185,45 @@
       return num/Math.sqrt(denU*denF);
     }
 
-    function drawCompass(user,figure){
-      const canvas=document.getElementById('compassCanvas');
-      const ctx=canvas.getContext('2d');
-      ctx.clearRect(0,0,canvas.width,canvas.height);
-
-      const size=canvas.width;
-      const radius=size*0.36;
-      const centerX=size/2,centerY=size/2;
-      const dims=["C1","C2","C3","C4"];
-      const angles=[-Math.PI/2,0,Math.PI/2,Math.PI];
-
-      function drawPoly(obj,color){
-        ctx.beginPath();
-        dims.forEach((dim,i)=>{
-          const val=obj[dim]||0;
-          const r=(val/100)*radius;
-          const x=centerX+r*Math.cos(angles[i]);
-          const y=centerY+r*Math.sin(angles[i]);
-          if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    async function sendEmail(email, best, sim, scores){
+      try {
+        await emailjs.send("service_scxnyg8","template_9asmc9m",{
+          user_email: email,
+          best_name: best.name,
+          best_sim: sim.toFixed(2),
+          C1: scores["C1"].toFixed(2),
+          C2: scores["C2"].toFixed(2),
+          C3: scores["C3"].toFixed(2),
+          C4: scores["C4"].toFixed(2)
         });
-        ctx.closePath();
-        ctx.fillStyle=color.replace('1)','0.3)');
-        ctx.fill();
-        ctx.strokeStyle=color;
-        ctx.lineWidth=2;
-        ctx.stroke();
+        document.getElementById('statusMsg').innerText = "✅ Hvala! Rezultati su uspešno poslati.";
+      } catch (err) {
+        document.getElementById('statusMsg').innerText = "⚠️ Došlo je do greške pri slanju. Pokušaj ponovo.";
       }
-
-      drawPoly(user,'rgba(56,176,0,1)');
-      drawPoly(figure,'rgba(255,110,110,1)');
     }
 
-    const form=document.getElementById('quiz');
-    const legendDiv=document.getElementById('legend');
-    const summaryDiv=document.getElementById('summary');
-    const detailsDiv=document.getElementById('details');
-
-    form.addEventListener('submit',async e=>{
+    document.getElementById('quiz').addEventListener('submit', async e=>{
       e.preventDefault();
-      const data=new FormData(form);
-      const raw=computeRawScores(data);
-      const dims=["C1","C2","C3","C4"];
-      const normed={};
-      dims.forEach(d=>normed[d]=Number(normLookup(d,raw[d]||0).toFixed(2)));
-
-      let best=null,worst=null,bestSim=-Infinity,worstSim=Infinity;
+      const form=new FormData(e.target);
+      const email=form.get("userEmail");
+      const raw=computeRawScores(form);
+      const normed={C1:raw.C1||0,C2:raw.C2||0,C3:raw.C3||0,C4:raw.C4||0};
+      let best=null,bestSim=-Infinity;
       FIGURES.forEach(f=>{
         const sim=profileSimilarity(normed,f.profile);
         if(sim>bestSim){bestSim=sim;best=f;}
-        if(sim<worstSim){worstSim=sim;worst=f;}
       });
 
-      drawCompass(normed,best.profile);
-
-      legendDiv.innerHTML='<span style="color:#38B000">■ Your profile</span><span style="color:#ff6e6e">■ '+best.name+'</span>';
-
-      summaryDiv.innerHTML=`
-        <h2>You are most similar to: ${best.name}</h2>
-        <p>${best.description}</p>
-        <p><strong>Similarity (Cohen):</strong> ${bestSim.toFixed(2)}</p>
-        ${best.wiki?`<p><a href="${best.wiki}" target="_blank">Pročitaj više →</a></p>`:""}
-        <h3>You are least similar to: ${worst.name}</h3>
-        <p>${worst.description}</p>
-        <p><strong>Similarity (Cohen):</strong> ${worstSim.toFixed(2)}</p>
-      `;
-
-      detailsDiv.innerHTML="";
-      dims.forEach(d=>{
-        detailsDiv.innerHTML+=`<div class="dim-desc"><strong>${d} - ${DIMS_INFO[d].name}</strong>: ${normed[d]}
-          <div><em>High score:</em> ${DIMS_INFO[d].high}</div>
-          <div><em>Low score:</em> ${DIMS_INFO[d].low}</div>
-        </div>`;
-      });
-
-      window.scrollTo({top:0,behavior:'smooth'});
+      if(email && email.trim()!==""){
+        await sendEmail(email,best,bestSim,normed);
+      } else {
+        document.getElementById('statusMsg').innerText = "✅ Test je uspešno poslat (bez e-maila).";
+      }
     });
 
     document.getElementById('resetBtn').addEventListener('click',()=>{
-      form.reset();
-      const ctx=document.getElementById('compassCanvas').getContext('2d');
-      ctx.clearRect(0,0,400,400);
-      legendDiv.innerHTML="";
-      summaryDiv.innerHTML="";
-      detailsDiv.innerHTML='<p class="muted small">After you submit your responses, the results will be shown here.</p>';
-      window.scrollTo({top:0,behavior:'smooth'});
+      document.getElementById('quiz').reset();
+      document.getElementById('statusMsg').innerText="";
     });
 
     loadData();
