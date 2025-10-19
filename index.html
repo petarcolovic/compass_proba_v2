@@ -143,6 +143,13 @@
       renderQuestions();
     }
 
+    const DIMS_INFO = {
+      "C1": {"name":"Clarity & Compliance vs Agility","high":"Structured Culture - Emphasizes rules, consistency, SOPs. Predictable, process-driven, ideal for scaling operations.","low":"Agile Culture - Values flexibility, improvisation, and informal processes. Good for startups, creative teams, or fast pivots."},
+      "C2": {"name":"Competitive Achievement","high":"Performance-Driven Culture - Values competition, ambition, and personal wins. Ideal for sales, finance, high-stakes roles.","low":"Empathetic Culture - Focused on emotional intelligence, harmony, and consensus. Ideal for care-based sectors or internal-facing roles."},
+      "C3": {"name":"Collective Loyalty","high":"Team-First Culture - Prioritizes group harmony, shared credit, and loyalty. Strong cohesion and retention.","low":"Individualist Culture - Encourages autonomy, self-expression, and personal goals. Energizing but can reduce cohesion."},
+      "C4": {"name":"Commitment to Growth","high":"Growth-Oriented Culture - Values planning, long-term thinking, perseverance, and saving resources for the future.","low":"Present-Oriented Culture - Optimized for short-term gains, flexibility, and immediate feedback loops. Can be highly reactive."}
+    };
+
     const DIMS = ["C1","C2","C3","C4"];
     const qWrap = document.getElementById('questions');
     const legendDiv = document.getElementById('legend');
@@ -251,8 +258,26 @@
 
       drawCompass(normed,best.profile);
       legendDiv.innerHTML='<span style="color:#38B000">■ Tvoj profil</span><span style="color:#ff6e6e">■ '+best.name+'</span>';
-      summaryDiv.innerHTML=`<h2>Najsličniji si: ${best.name}</h2><p>${best.description}</p><p><strong>Sličnost:</strong> ${bestSim.toFixed(2)}</p>`;
-      detailsDiv.innerHTML=DIMS.map(d=>`<div class='dim-desc'><strong>${d}</strong>: ${normed[d]}</div>`).join('');
+
+      summaryDiv.innerHTML=`
+        <h2>Najsličniji si: ${best.name}</h2>
+        <p>${best.description}</p>
+        <p><strong>Sličnost (Koen):</strong> ${bestSim.toFixed(2)}</p>
+        ${best.wiki?`<p><a href="${best.wiki}" target="_blank">Pročitaj više →</a></p>`:""}
+        <h3>Najmanje sličan si: ${worst.name}</h3>
+        <p>${worst.description}</p>
+        <p><strong>Sličnost (Koen):</strong> ${worstSim.toFixed(2)}</p>
+      `;
+
+      detailsDiv.innerHTML="";
+      DIMS.forEach(d=>{
+        detailsDiv.innerHTML+=`
+          <div class="dim-desc">
+            <strong>${d} - ${DIMS_INFO[d].name}</strong>: ${normed[d]}
+            <div><em>Visok skor:</em> ${DIMS_INFO[d].high}</div>
+            <div><em>Nizak skor:</em> ${DIMS_INFO[d].low}</div>
+          </div>`;
+      });
 
       if(email && email.trim()!==""){
         await sendEmail(email,best,bestSim,normed);
