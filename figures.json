@@ -98,5 +98,127 @@
       "C3": 35.0,
       "C4": 55.0
     }
-  }
+  },
+
+  {
+    "name": "Jeff Bezos",
+    "description": "Corporate Leader, Digital / Tech Era (2010s–2020s)",
+    "wiki": "https://en.wikipedia.org/wiki/Elon_Musk",
+    "profile": {
+      "C1": 60.0,
+      "C2": 50.0,
+      "C3": 65.0,
+      "C4": 70.0
+    }
+  },
+
+  {
+    "name": "Sundar Pichai",
+    "description": "Corporate Leader, Digital / Tech Era (2010s–2020s)",
+    "wiki": "https://en.wikipedia.org/wiki/Elon_Musk",
+    "profile": {
+      "C1": 60.0,
+      "C2": 10.0,
+      "C3": 70.0,
+      "C4": 55.0
+    }
+  },
+
+  {
+    "name": "Tim Cook",
+    "description": "Corporate Leader, Digital / Tech Era (2010s–2020s)",
+    "wiki": "https://en.wikipedia.org/wiki/Elon_Musk",
+    "profile": {
+      "C1": 60.0,
+      "C2": 20.0,
+      "C3": 60.0,
+      "C4": 60.0
+    }
+  },
+
+  {
+    "name": "Satya Nadella",
+    "description": "Corporate Leader, Contemporary Leadership (2000s–2020s)",
+    "wiki": "https://en.wikipedia.org/wiki/Elon_Musk",
+    "profile": {
+      "C1": 35.0,
+      "C2": 10.0,
+      "C3": 65.0,
+      "C4": 60.0
+    }
+  },
+
+  {
+    "name": "Mary Barra",
+    "description": "Corporate Leader, Contemporary Leadership (2000s–2020s)",
+    "wiki": "https://en.wikipedia.org/wiki/Elon_Musk",
+    "profile": {
+      "C1": 50.0,
+      "C2": 30.0,
+      "C3": 65.0,
+      "C4": 50.0
+    }
+  },
+
+{
+    "name": "Warren Buffett",
+    "description": "Corporate Leader, Late 20th-21st Century (1960-2020s)",
+    "wiki": "https://en.wikipedia.org/wiki/Elon_Musk",
+    "profile": {
+      "C1": 60.0,
+      "C2": 65.0,
+      "C3": 65.0,
+      "C4": 70.0
+    }
+  },
+  
+{
+    "name": "Richard Branson",
+    "description": "Corporate Leader, Contemporary Leadership (2000s–2020s)",
+    "wiki": "https://en.wikipedia.org/wiki/Elon_Musk",
+    "profile": {
+      "C1": 10.0,
+      "C2": 55.0,
+      "C3": 10.0,
+      "C4": 50.0
+    }
+  },
+
+{
+    "name": "Indra Nooyi",
+    "description": "Corporate Leader, Contemporary Leadership (2000s–2020s)",
+    "wiki": "https://en.wikipedia.org/wiki/Elon_Musk",
+    "profile": {
+      "C1": 60.0,
+      "C2": 20.0,
+      "C3": 65.0,
+      "C4": 65.0
+    }
+  },
+
+{
+    "name": "Jack Welch",
+    "description": "Corporate Leader, Post-WWII Corporate Era (1980-1990s)",
+    "wiki": "https://en.wikipedia.org/wiki/Elon_Musk",
+    "profile": {
+      "C1": 60.0,
+      "C2": 70.0,
+      "C3": 20.0,
+      "C4": 50.0
+    }
+  },
+
+{
+    "name": "Leena Nair",
+    "description": "Corporate Leader, Contemporary Leadership (2000s–2020s)",
+    "wiki": "https://en.wikipedia.org/wiki/Elon_Musk",
+    "profile": {
+      "C1": 60.0,
+      "C2": 20.0,
+      "C3": 70.0,
+      "C4": 70.0
+    }
+  },
+  
+  
 ]
