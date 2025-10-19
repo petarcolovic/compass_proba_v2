@@ -251,14 +251,14 @@
         ${best.wiki?`<p><a href="${best.wiki}" target="_blank">Pročitaj više →</a></p>`:""}
         <h3>You are least similar to: ${worst.name}</h3>
         <p>${worst.description}</p>
-        <p><strong>Sličnost (Koen):</strong> ${worstSim.toFixed(2)}</p>
+        <p><strong>Similarity (Cohen):</strong> ${worstSim.toFixed(2)}</p>
       `;
 
       detailsDiv.innerHTML="";
       dims.forEach(d=>{
         detailsDiv.innerHTML+=`<div class="dim-desc"><strong>${d} - ${DIMS_INFO[d].name}</strong>: ${normed[d]}
-          <div><em>Visok skor:</em> ${DIMS_INFO[d].high}</div>
-          <div><em>Nizak skor:</em> ${DIMS_INFO[d].low}</div>
+          <div><em>High score:</em> ${DIMS_INFO[d].high}</div>
+          <div><em>Low score:</em> ${DIMS_INFO[d].low}</div>
         </div>`;
       });
 
