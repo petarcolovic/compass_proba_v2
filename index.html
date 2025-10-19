@@ -79,7 +79,7 @@
       <!-- Leva strana: pitanja -->
       <form id="quiz" class="card">
         <div class="intro">
-          <p class="muted">Odgovori za svaku tvrdnju od 1 (uopšte se ne slažem) do 5 (u potpunosti se slažem).</p>
+          <p class="muted">Responses for each statement from 1 (do not agree at all) to 5 (completely agree).</p>
         </div>
         <div id="questions"></div>
         <div class="actions">
@@ -145,7 +145,7 @@
                 <input type="radio" name="q_${q.id}" value="${v}" required /> ${v}
               </label>`).join('')}
           </div>
-          <div class="small muted">Skala: 1 = nimalo • 5 = u potpunosti</div>`;
+          <div class="small muted">Scale: 1 = not at all • 5 = completely</div>`;
         qWrap.appendChild(div);
       });
     }
