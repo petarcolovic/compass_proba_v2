@@ -79,12 +79,12 @@
       <!-- Leva strana: pitanja -->
       <form id="quiz" class="card">
         <div class="intro">
-          <p class="muted">Responses for each statement from 1 (do not agree at all) to 5 (agree completely).</p>
+          <p class="muted">Odgovori za svaku tvrdnju od 1 (uopšte se ne slažem) do 5 (u potpunosti se slažem).</p>
         </div>
         <div id="questions"></div>
         <div class="actions">
-          <button type="submit">Send</button>
-          <button type="button" id="resetBtn" class="muted" style="background:transparent;color:var(--text);border:1px solid rgba(0,0,0,.12)">Erase</button>
+          <button type="submit">Pošalji</button>
+          <button type="button" id="resetBtn" class="muted" style="background:transparent;color:var(--text);border:1px solid rgba(0,0,0,.12)">Poništi</button>
         </div>
       </form>
 
@@ -145,7 +145,7 @@
                 <input type="radio" name="q_${q.id}" value="${v}" required /> ${v}
               </label>`).join('')}
           </div>
-          <div class="small muted">Scale: 1 = not at all • 5 = completely</div>`;
+          <div class="small muted">Skala: 1 = nimalo • 5 = u potpunosti</div>`;
         qWrap.appendChild(div);
       });
     }
@@ -242,23 +242,23 @@
 
       drawCompass(normed,best.profile);
 
-      legendDiv.innerHTML='<span style="color:#38B000">■ Your profile</span><span style="color:#ff6e6e">■ '+best.name+'</span>';
+      legendDiv.innerHTML='<span style="color:#38B000">■ Tvoj profil</span><span style="color:#ff6e6e">■ '+best.name+'</span>';
 
       summaryDiv.innerHTML=`
-        <h2>You are most similar to: ${best.name}</h2>
+        <h2>Najsličniji si: ${best.name}</h2>
         <p>${best.description}</p>
-        <p><strong>Similarity (Cohen):</strong> ${bestSim.toFixed(2)}</p>
+        <p><strong>Sličnost (Koen):</strong> ${bestSim.toFixed(2)}</p>
         ${best.wiki?`<p><a href="${best.wiki}" target="_blank">Pročitaj više →</a></p>`:""}
-        <h3>You are least similar to: ${worst.name}</h3>
+        <h3>Najmanje sličan si: ${worst.name}</h3>
         <p>${worst.description}</p>
-        <p><strong>Similarity (Cohen):</strong> ${worstSim.toFixed(2)}</p>
+        <p><strong>Sličnost (Koen):</strong> ${worstSim.toFixed(2)}</p>
       `;
 
       detailsDiv.innerHTML="";
       dims.forEach(d=>{
         detailsDiv.innerHTML+=`<div class="dim-desc"><strong>${d} - ${DIMS_INFO[d].name}</strong>: ${normed[d]}
-          <div><em>High score:</em> ${DIMS_INFO[d].high}</div>
-          <div><em>Low score:</em> ${DIMS_INFO[d].low}</div>
+          <div><em>Visok skor:</em> ${DIMS_INFO[d].high}</div>
+          <div><em>Nizak skor:</em> ${DIMS_INFO[d].low}</div>
         </div>`;
       });
 
