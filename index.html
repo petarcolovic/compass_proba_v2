@@ -118,7 +118,6 @@
           <div class="compass-bg" style="position:relative;">
             <img src="compass.svg" alt="Compass background"/>
             <canvas id="compassCanvas" width="400" height="400"></canvas>
-            <!-- Etikete oko kompasa -->
             <div class="label" style="top:10px;left:50%;">C1</div>
             <div class="label" style="top:50%;left:95%;">C2</div>
             <div class="label" style="bottom:10px;left:50%;">C3</div>
@@ -145,9 +144,12 @@
     }
 
     const DIMS = ["C1","C2","C3","C4"];
+    const qWrap = document.getElementById('questions');
+    const legendDiv = document.getElementById('legend');
+    const summaryDiv = document.getElementById('summary');
+    const detailsDiv = document.getElementById('details');
 
     function renderQuestions(){
-      const qWrap = document.getElementById('questions');
       qWrap.innerHTML = '';
       ITEMS.forEach(q=>{
         const div=document.createElement('div');
@@ -185,6 +187,37 @@
       return num/Math.sqrt(denU*denF);
     }
 
+    function drawCompass(user,figure){
+      const canvas=document.getElementById('compassCanvas');
+      const ctx=canvas.getContext('2d');
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+
+      const size=canvas.width;
+      const radius=size*0.36;
+      const centerX=size/2,centerY=size/2;
+      const angles=[-Math.PI/2,0,Math.PI/2,Math.PI];
+
+      function drawPoly(obj,color){
+        ctx.beginPath();
+        DIMS.forEach((dim,i)=>{
+          const val=obj[dim]||0;
+          const r=(val/100)*radius;
+          const x=centerX+r*Math.cos(angles[i]);
+          const y=centerY+r*Math.sin(angles[i]);
+          if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+        });
+        ctx.closePath();
+        ctx.fillStyle=color.replace('1)','0.3)');
+        ctx.fill();
+        ctx.strokeStyle=color;
+        ctx.lineWidth=2;
+        ctx.stroke();
+      }
+
+      drawPoly(user,'rgba(56,176,0,1)');
+      drawPoly(figure,'rgba(255,110,110,1)');
+    }
+
     async function sendEmail(email, best, sim, scores){
       try {
         await emailjs.send("service_scxnyg8","template_9asmc9m",{
@@ -196,9 +229,9 @@
           C3: scores["C3"].toFixed(2),
           C4: scores["C4"].toFixed(2)
         });
-        document.getElementById('statusMsg').innerText = "✅ Hvala! Rezultati su uspešno poslati.";
+        document.getElementById('statusMsg').innerText = "✅ Rezultati su prikazani i poslati na e-mail.";
       } catch (err) {
-        document.getElementById('statusMsg').innerText = "⚠️ Došlo je do greške pri slanju. Pokušaj ponovo.";
+        document.getElementById('statusMsg').innerText = "⚠️ Rezultati prikazani, ali slanje nije uspelo.";
       }
     }
 
@@ -208,22 +241,36 @@
       const email=form.get("userEmail");
       const raw=computeRawScores(form);
       const normed={C1:raw.C1||0,C2:raw.C2||0,C3:raw.C3||0,C4:raw.C4||0};
-      let best=null,bestSim=-Infinity;
+
+      let best=null,worst=null,bestSim=-Infinity,worstSim=Infinity;
       FIGURES.forEach(f=>{
         const sim=profileSimilarity(normed,f.profile);
         if(sim>bestSim){bestSim=sim;best=f;}
+        if(sim<worstSim){worstSim=sim;worst=f;}
       });
+
+      drawCompass(normed,best.profile);
+      legendDiv.innerHTML='<span style="color:#38B000">■ Tvoj profil</span><span style="color:#ff6e6e">■ '+best.name+'</span>';
+      summaryDiv.innerHTML=`<h2>Najsličniji si: ${best.name}</h2><p>${best.description}</p><p><strong>Sličnost:</strong> ${bestSim.toFixed(2)}</p>`;
+      detailsDiv.innerHTML=DIMS.map(d=>`<div class='dim-desc'><strong>${d}</strong>: ${normed[d]}</div>`).join('');
 
       if(email && email.trim()!==""){
         await sendEmail(email,best,bestSim,normed);
       } else {
-        document.getElementById('statusMsg').innerText = "✅ Test je uspešno poslat (bez e-maila).";
+        document.getElementById('statusMsg').innerText = "✅ Rezultati prikazani (e-mail nije unet).";
       }
+
+      window.scrollTo({top:0,behavior:'smooth'});
     });
 
     document.getElementById('resetBtn').addEventListener('click',()=>{
       document.getElementById('quiz').reset();
       document.getElementById('statusMsg').innerText="";
+      const ctx=document.getElementById('compassCanvas').getContext('2d');
+      ctx.clearRect(0,0,400,400);
+      legendDiv.innerHTML="";
+      summaryDiv.innerHTML="";
+      detailsDiv.innerHTML="";
     });
 
     loadData();
