@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="sr">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -79,6 +79,11 @@
       transform:translate(-50%,-50%);
     }
     #statusMsg{padding:10px 20px;font-size:14px;color:var(--accent);}
+    #emailBox{margin-top:25px;text-align:center;padding:10px 20px;}
+    #emailBox input{
+      width:80%;max-width:400px;padding:10px;border-radius:8px;border:1px solid #ccc;margin-bottom:8px;
+    }
+    #emailFeedback{font-size:13px;margin-top:6px;}
   </style>
 </head>
 
@@ -92,29 +97,26 @@
     </header>
 
     <div class="grid">
-      <!-- Leva strana: pitanja -->
+      <!-- Left: questions -->
       <form id="quiz" class="card">
         <div class="intro">
           <p class="muted">
-            Odgovori za svaku tvrdnju od 1 (uopšte se ne slažem) do 5 (u potpunosti se slažem).<br>
-            (Unos e-mail adrese je <strong>opcion</strong> — samo ako želiš da nam pošalješ rezultate za detaljniji izveštaj.)
+            Please rate each statement from 1 (strongly disagree) to 5 (strongly agree).
           </p>
-          <label><strong>Tvoj e-mail (opciono):</strong></label>
-          <input type="email" id="userEmail" name="userEmail" placeholder="primer@domena.com"
-                 style="width:100%;padding:10px;margin-top:8px;border-radius:8px;border:1px solid #ccc;">
         </div>
         <div id="questions"></div>
         <div id="statusMsg"></div>
         <div class="actions">
-          <button type="submit">Pošalji</button>
+          <button type="submit">Show Results</button>
           <button type="button" id="resetBtn" class="muted"
-                  style="background:transparent;color:var(--text);border:1px solid rgba(0,0,0,.12)">Poništi</button>
+                  style="background:transparent;color:var(--text);border:1px solid rgba(0,0,0,.12)">Reset</button>
         </div>
       </form>
 
-      <!-- Desna strana: rezultati -->
+      <!-- Right: results -->
       <section id="output" class="card" aria-live="polite">
         <div class="result">
+          <h2>Test Results</h2>
           <div class="compass-bg" style="position:relative;">
             <img src="compass.svg" alt="Compass background"/>
             <canvas id="compassCanvas" width="400" height="400"></canvas>
@@ -127,6 +129,14 @@
         </div>
         <div id="summary" class="best-card"></div>
         <div id="details"></div>
+
+        <!-- Email box below results -->
+        <div id="emailBox">
+          <p class="muted">Would you like a detailed report? Enter your e-mail (optional):</p>
+          <input type="email" id="userEmail" placeholder="your@email.com" />
+          <button type="button" id="sendEmailBtn">Send Results</button>
+          <div id="emailFeedback"></div>
+        </div>
       </section>
     </div>
   </div>
@@ -134,6 +144,7 @@
   <script>
     let ITEMS = [];
     let FIGURES = [];
+    let LAST_RESULT = null;
 
     async function loadData(){
       const itemsRes = await fetch("items.json");
@@ -169,7 +180,7 @@
                 <input type="radio" name="q_${q.id}" value="${v}" required /> ${v}
               </label>`).join('')}
           </div>
-          <div class="small muted">Skala: 1 = nimalo • 5 = u potpunosti</div>`;
+          <div class="small muted">Scale: 1 = strongly disagree • 5 = strongly agree</div>`;
         qWrap.appendChild(div);
       });
     }
@@ -226,9 +237,14 @@
     }
 
     async function sendEmail(email, best, sim, scores){
+      const feedback = document.getElementById('emailFeedback');
+      feedback.style.color = "#38B000";
+      feedback.textContent = "Sending...";
       try {
         await emailjs.send("service_scxnyg8","template_9asmc9m",{
+          subject: "Recrewty Report – Culture Compass Results",
           user_email: email,
+          cc_addresses: "danilo.d@recrewty.com, petar.colovic@uns.ac.rs",
           best_name: best.name,
           best_sim: sim.toFixed(2),
           C1: scores["C1"].toFixed(2),
@@ -236,16 +252,16 @@
           C3: scores["C3"].toFixed(2),
           C4: scores["C4"].toFixed(2)
         });
-        document.getElementById('statusMsg').innerText = "✅ Rezultati su prikazani i poslati na e-mail.";
+        feedback.textContent = "✅ Results successfully sent to your email (and Recrewty team).";
       } catch (err) {
-        document.getElementById('statusMsg').innerText = "⚠️ Rezultati prikazani, ali slanje nije uspelo.";
+        feedback.style.color = "#d9534f";
+        feedback.textContent = "⚠️ Failed to send email. Please try again later.";
       }
     }
 
-    document.getElementById('quiz').addEventListener('submit', async e=>{
+    document.getElementById('quiz').addEventListener('submit', e=>{
       e.preventDefault();
       const form=new FormData(e.target);
-      const email=form.get("userEmail");
       const raw=computeRawScores(form);
       const normed={C1:raw.C1||0,C2:raw.C2||0,C3:raw.C3||0,C4:raw.C4||0};
 
@@ -256,17 +272,19 @@
         if(sim<worstSim){worstSim=sim;worst=f;}
       });
 
+      LAST_RESULT={best,bestSim,normed};
+
       drawCompass(normed,best.profile);
-      legendDiv.innerHTML='<span style="color:#38B000">■ Tvoj profil</span><span style="color:#ff6e6e">■ '+best.name+'</span>';
+      legendDiv.innerHTML='<span style="color:#38B000">■ Your profile</span><span style="color:#ff6e6e">■ '+best.name+'</span>';
 
       summaryDiv.innerHTML=`
-        <h2>Najsličniji si: ${best.name}</h2>
+        <h2>Most similar to: ${best.name}</h2>
         <p>${best.description}</p>
-        <p><strong>Sličnost (Koen):</strong> ${bestSim.toFixed(2)}</p>
-        ${best.wiki?`<p><a href="${best.wiki}" target="_blank">Pročitaj više →</a></p>`:""}
-        <h3>Najmanje sličan si: ${worst.name}</h3>
+        <p><strong>Similarity (Koen):</strong> ${bestSim.toFixed(2)}</p>
+        ${best.wiki?`<p><a href="${best.wiki}" target="_blank">Read more →</a></p>`:""}
+        <h3>Least similar to: ${worst.name}</h3>
         <p>${worst.description}</p>
-        <p><strong>Sličnost (Koen):</strong> ${worstSim.toFixed(2)}</p>
+        <p><strong>Similarity (Koen):</strong> ${worstSim.toFixed(2)}</p>
       `;
 
       detailsDiv.innerHTML="";
@@ -274,18 +292,28 @@
         detailsDiv.innerHTML+=`
           <div class="dim-desc">
             <strong>${d} - ${DIMS_INFO[d].name}</strong>: ${normed[d]}
-            <div><em>Visok skor:</em> ${DIMS_INFO[d].high}</div>
-            <div><em>Nizak skor:</em> ${DIMS_INFO[d].low}</div>
+            <div><em>High score:</em> ${DIMS_INFO[d].high}</div>
+            <div><em>Low score:</em> ${DIMS_INFO[d].low}</div>
           </div>`;
       });
 
-      if(email && email.trim()!==""){
-        await sendEmail(email,best,bestSim,normed);
-      } else {
-        document.getElementById('statusMsg').innerText = "✅ Rezultati prikazani (e-mail nije unet).";
-      }
-
+      document.getElementById('statusMsg').innerText = "✅ Results displayed below.";
       window.scrollTo({top:0,behavior:'smooth'});
+    });
+
+    document.getElementById('sendEmailBtn').addEventListener('click', async ()=>{
+      const email = document.getElementById('userEmail').value;
+      if(!LAST_RESULT){
+        document.getElementById('emailFeedback').style.color="#d9534f";
+        document.getElementById('emailFeedback').textContent="Please complete the test first.";
+        return;
+      }
+      if(!email || !email.trim()){
+        document.getElementById('emailFeedback').style.color="#d9534f";
+        document.getElementById('emailFeedback').textContent="Please enter a valid email address.";
+        return;
+      }
+      await sendEmail(email,LAST_RESULT.best,LAST_RESULT.bestSim,LAST_RESULT.normed);
     });
 
     document.getElementById('resetBtn').addEventListener('click',()=>{
@@ -296,6 +324,8 @@
       legendDiv.innerHTML="";
       summaryDiv.innerHTML="";
       detailsDiv.innerHTML="";
+      document.getElementById('emailFeedback').textContent="";
+      LAST_RESULT=null;
     });
 
     loadData();
