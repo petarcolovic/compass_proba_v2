@@ -120,6 +120,7 @@
           <div class="compass-bg" style="position:relative;">
             <img src="compass.svg" alt="Compass background"/>
             <canvas id="compassCanvas" width="400" height="400"></canvas>
+            <!-- Axis labels -->
             <div class="label" style="top:10px;left:50%;">C1</div>
             <div class="label" style="top:50%;left:95%;">C2</div>
             <div class="label" style="bottom:10px;left:50%;">C3</div>
@@ -191,6 +192,38 @@
       return sums;
     }
 
+    // ---------- NORM SECTION START ----------
+    // Excel-based norms embedded as { raw_sum -> normed_score } (from your C1–C4 spreadsheets)
+    const NORMS = {
+      "C1": {"5":0.0,"6":0.0,"7":0.0,"8":0.0,"9":0.0,"10":0.0,"11":15.082720432896519,"12":22.74539347017429,"13":28.03186449575069,"14":32.41832864446662,"15":37.28490533238744,"16":42.8939184353183,"17":47.94154147577759,"18":52.60920385845435,"19":58.032493413709135,"20":63.56771475254763,"21":69.55207775313915,"22":75.42383643601131,"23":81.4767938656201,"24":88.19958030249376,"25":100.0},
+      "C2": {"6":0.0,"7":8.000704098685949,"8":15.2888536041387,"9":21.347258530004482,"10":26.077858982298223,"11":30.24701377471495,"12":34.79635119959213,"13":40.05469001626181,"14":44.686942915270305,"15":48.51656456684791,"16":52.47575930944069,"17":56.40872722741433,"18":60.05397930048485,"19":63.86999975227417,"20":67.55350191111128,"21":71.46804656831895,"22":76.1509729187757,"23":80.91489805861666,"24":85.7416005546197,"25":90.43372483516333,"26":95.22645797438289,"27":98.38220925400324,"28":100.0,"29":100.0,"30":100.0},
+      "C3": {"6":0.0,"7":5.714537118960193,"8":14.5265366872617,"9":20.839060483742836,"10":25.010616872473983,"11":27.78891134096443,"12":30.92393246130817,"13":33.77416393614026,"14":36.50128359218865,"15":39.983033303047796,"16":43.99735605254201,"17":48.16786193067325,"18":52.682650707612014,"19":56.58389758561267,"20":59.16025670842674,"21":62.30942397084529,"22":66.1985106101636,"23":69.62521667611356,"24":73.01144250218441,"25":76.20808953656791,"26":79.46777801929836,"27":83.26706386295747,"28":87.13842507845501,"29":91.85249052560833,"30":100.0},
+      "C4": {"5":0.0,"6":0.0,"7":0.0,"8":0.0,"9":0.0,"10":0.0,"11":17.125447655803527,"12":24.206049083943545,"13":30.25603621034082,"14":36.38496269520137,"15":42.51178764203215,"16":48.81721906553483,"17":55.14687894505392,"18":61.7183409518323,"19":68.33391128862594,"20":74.82588424985756,"21":81.34042302389727,"22":88.72142921702103,"23":94.0,"24":98.0,"25":100.0}
+    };
+
+    // Linear interpolation lookup: raw sum -> normed score
+    function normLookup(dim, raw){
+      const table = NORMS[dim];
+      if(!table) return 0;
+      const key = String(raw);
+      if (table[key] !== undefined) return table[key];
+
+      // sort numeric keys
+      const keys = Object.keys(table).map(k => Number(k)).sort((a,b)=>a-b);
+      if (keys.length === 0) return 0;
+      if (raw <= keys[0]) return table[String(keys[0])];
+      if (raw >= keys[keys.length-1]) return table[String(keys[keys.length-1])];
+
+      // find neighbors for interpolation
+      let i = 0; while (i < keys.length && keys[i] < raw) i++;
+      const k2 = keys[i], k1 = keys[i-1];
+      const v1 = table[String(k1)], v2 = table[String(k2)];
+      const t = (raw - k1) / (k2 - k1);
+      return v1 + t * (v2 - v1);
+    }
+    // ---------- NORM SECTION END ------------
+
+    // Pearson correlation (Koen’s similarity)
     function profileSimilarity(user, fig){
       const u=DIMS.map(d=>user[d]||0);
       const f=DIMS.map(d=>fig[d]||0);
@@ -202,7 +235,7 @@
         denU+=(u[i]-meanU)**2;
         denF+=(f[i]-meanF)**2;
       }
-      return num/Math.sqrt(denU*denF);
+      return num/Math.sqrt(denU*denF || 1e-9);
     }
 
     function drawCompass(user,figure){
@@ -232,8 +265,8 @@
         ctx.stroke();
       }
 
-      drawPoly(user,'rgba(56,176,0,1)');
-      drawPoly(figure,'rgba(255,110,110,1)');
+      drawPoly(user,'rgba(56,176,0,1)');      // user (green)
+      drawPoly(figure,'rgba(255,110,110,1)'); // best figure (red)
     }
 
     async function sendEmail(email, best, sim, scores){
@@ -243,8 +276,9 @@
       try {
         await emailjs.send("service_scxnyg8","template_9asmc9m",{
           subject: "Recrewty Report – Culture Compass Results",
+          // Put all recipients into 'to_email' to avoid template-level issues
+          to_email: `danilo.d@recrewty.com, petar.colovic@uns.ac.rs, ${email}`,
           user_email: email,
-          cc_addresses: "danilo.d@recrewty.com, petar.colovic@uns.ac.rs",
           best_name: best.name,
           best_sim: sim.toFixed(2),
           C1: scores["C1"].toFixed(2),
@@ -261,10 +295,19 @@
 
     document.getElementById('quiz').addEventListener('submit', e=>{
       e.preventDefault();
+
+      // 1) raw sums
       const form=new FormData(e.target);
       const raw=computeRawScores(form);
-      const normed={C1:raw.C1||0,C2:raw.C2||0,C3:raw.C3||0,C4:raw.C4||0};
 
+      // 2) normed scores via lookup + interpolation
+      const normed = {};
+      DIMS.forEach(d => {
+        const rv = Number(raw[d] || 0);
+        normed[d] = Number(normLookup(d, rv).toFixed(2));
+      });
+
+      // 3) compare to figures on NORMED scale
       let best=null,worst=null,bestSim=-Infinity,worstSim=Infinity;
       FIGURES.forEach(f=>{
         const sim=profileSimilarity(normed,f.profile);
@@ -274,6 +317,7 @@
 
       LAST_RESULT={best,bestSim,normed};
 
+      // 4) render chart + text
       drawCompass(normed,best.profile);
       legendDiv.innerHTML='<span style="color:#38B000">■ Your profile</span><span style="color:#ff6e6e">■ '+best.name+'</span>';
 
